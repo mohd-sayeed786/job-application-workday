@@ -26,6 +26,12 @@
       "path": "./skills/job-apply/SKILL.md",
       "description": "Fill out job applications automatically using your resume",
       "invocation": "/job-apply"
+    },
+    {
+      "name": "job-search",
+      "path": "./skills/job-search/SKILL.md",
+      "description": "Search LinkedIn jobs with connection and hiring manager insights",
+      "invocation": "/job-search"
     }
   ],
   "repository": {

@@ -2,13 +2,28 @@
 
 AI-powered job application assistant that automatically fills out job applications on LinkedIn Easy Apply, Greenhouse, Ashby, and Workday using browser automation.
 
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `/job-apply` | Fill out job applications automatically using your resume |
+| `/job-search` | Search LinkedIn for jobs with connections and hiring manager insights |
+
 ## Features
 
+### Job Apply (`/job-apply`)
 - **One-time profile setup**: Extract your information from a resume (PDF, DOCX, or TXT)
 - **Multi-platform support**: LinkedIn Easy Apply, Greenhouse, Ashby, Workday
 - **Smart field mapping**: Automatically matches your profile to form fields
 - **Safety first**: Never submits without your explicit confirmation
 - **Resume storage**: Profile saved locally for reuse across applications
+
+### Job Search (`/job-search`)
+- **Smart keyword suggestions**: Auto-generates search terms from your resume
+- **Connection insights**: Finds jobs at companies where you have connections
+- **Hiring manager discovery**: Identifies jobs with hiring managers listed
+- **Auto-inferred filters**: Location and experience level from your profile
+- **Results saved**: All searches saved to `~/.claude-job-searches/` as JSON
 
 ## Requirements
 
@@ -86,6 +101,34 @@ Once your profile is set up:
 
 4. Review the summary and confirm submission
 
+### Searching for Jobs
+
+Use `/job-search` to find jobs where you have an advantage:
+
+1. Invoke the skill:
+   ```
+   /job-search
+   ```
+
+2. Claude will suggest keywords based on your resume:
+   ```
+   Based on your resume, I suggest searching for:
+   - Keywords: "Senior Software Engineer", "Staff Engineer"
+   - Location: San Francisco, CA
+   - Experience: Mid-Senior (7 years)
+
+   Ready to search, or would you like to adjust?
+   ```
+
+3. Confirm or modify the suggestions
+
+4. Review results prioritized by:
+   - Jobs with hiring managers listed (highest priority)
+   - Jobs with 1st-degree connections
+   - Jobs with alumni connections
+
+Results are automatically saved to `~/.claude-job-searches/`.
+
 ## Supported Platforms
 
 | Platform | URL Pattern | Status |
@@ -110,6 +153,22 @@ To reset your profile:
 ```
 /job-apply reset profile
 ```
+
+## Search Results Storage
+
+Job search results are saved to `~/.claude-job-searches/` with timestamped filenames:
+
+```
+~/.claude-job-searches/
+  search-2026-01-06T10-30-00.json
+  search-2026-01-07T14-15-00.json
+```
+
+Each file contains:
+- Search parameters (keywords, location, filters)
+- List of jobs with full details
+- Connection and hiring manager information
+- Priority ranking
 
 ## Safety Features
 
