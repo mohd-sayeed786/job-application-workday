@@ -8,7 +8,10 @@
   "plugins": [
     {
       "name": "job-apply",
-      "source": "github:neonwatty/job-apply-plugin",
+      "source": {
+        "source": "github",
+        "repo": "neonwatty/job-apply-plugin"
+      },
       "description": "AI-powered job application assistant for LinkedIn, Greenhouse, Ashby, and Workday",
       "version": "1.0.0",
       "tags": ["productivity", "job-search", "browser-automation"]
