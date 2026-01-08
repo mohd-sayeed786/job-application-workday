@@ -4,7 +4,7 @@
   "description": "AI-powered job application assistant for LinkedIn Easy Apply, Greenhouse, Ashby, and Workday",
   "author": {
     "name": "Jeremy Watt",
-    "github": "neonwatty"
+    "url": "https://github.com/neonwatty"
   },
   "license": "MIT",
   "keywords": [
@@ -16,26 +16,6 @@
     "browser-automation",
     "resume"
   ],
-  "requirements": {
-    "mcp_servers": ["claude-in-chrome"],
-    "tools": ["Read", "Write", "Bash"]
-  },
-  "skills": [
-    {
-      "name": "job-apply",
-      "path": "./skills/job-apply/SKILL.md",
-      "description": "Fill out job applications automatically using your resume",
-      "invocation": "/job-apply"
-    },
-    {
-      "name": "job-search",
-      "path": "./skills/job-search/SKILL.md",
-      "description": "Search LinkedIn jobs with connection and hiring manager insights",
-      "invocation": "/job-search"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/neonwatty/job-apply-plugin"
-  }
+  "skills": "./skills",
+  "repository": "https://github.com/neonwatty/job-apply-plugin"
 }
