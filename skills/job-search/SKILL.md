@@ -1,8 +1,12 @@
+---
+name: job-search
+description: Search LinkedIn for jobs with connections and hiring manager insights. Use when the user wants to find jobs, search for positions, or explore job opportunities.
+allowed-tools: Read, Write, Bash, mcp__claude-in-chrome__*
+---
+
 # Job Search Assistant
 
 A Claude Code skill for searching LinkedIn jobs with a focus on finding positions where you have network connections or hiring managers are listed.
-
----
 
 ## Initial Prompt
 

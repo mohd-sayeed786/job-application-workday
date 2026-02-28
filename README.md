@@ -1,6 +1,6 @@
 # Job Apply Plugin for Claude Code
 
-AI-powered job application assistant that automatically fills out job applications on LinkedIn Easy Apply, Greenhouse, Ashby, and Workday using browser automation.
+AI-powered job application assistant that automatically fills out job applications on LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, and Workday using browser automation.
 
 ## Skills
 
@@ -13,7 +13,8 @@ AI-powered job application assistant that automatically fills out job applicatio
 
 ### Job Apply (`/job-apply`)
 - **One-time profile setup**: Extract your information from a resume (PDF, DOCX, or TXT)
-- **Multi-platform support**: LinkedIn Easy Apply, Greenhouse, Ashby, Workday
+- **Multi-platform support**: LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, Workday
+- **Dual-tool architecture**: Chrome MCP for authenticated sites, Playwright MCP for form filling and file uploads
 - **Smart field mapping**: Automatically matches your profile to form fields
 - **Safety first**: Never submits without your explicit confirmation
 - **Resume storage**: Profile saved locally for reuse across applications
@@ -28,44 +29,15 @@ AI-powered job application assistant that automatically fills out job applicatio
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) CLI
-- [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome) MCP server for browser automation
+- [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome) MCP server for authenticated browser sessions (LinkedIn)
+- [Playwright MCP](https://github.com/anthropics/claude-code/tree/main/.claude/plugins/playwright) server for form filling, file uploads, and iframe interaction
 
 ## Installation
 
-### From GitHub Marketplace
-
 ```bash
-/plugin marketplace add neonwatty/job-apply-plugin
-/plugin install job-apply
+claude plugin marketplace add neonwatty/job-apply-plugin
+claude plugin install job-apply-plugin@job-apply
 ```
-
-### Manual Installation
-
-Clone this repository to your local machine:
-
-```bash
-git clone https://github.com/neonwatty/job-apply-plugin.git
-cd job-apply-plugin
-```
-
-Then in Claude Code:
-```bash
-/plugin install /path/to/job-apply-plugin
-```
-
-### Claude Desktop Installation
-
-Claude Desktop requires manual skill upload:
-
-1. **Download the ZIP file** from the [latest release](https://github.com/neonwatty/job-apply-plugin/releases/latest)
-
-2. **Open Claude Desktop** and go to **Settings**
-
-3. **Click "Upload skill"** and select the downloaded `.zip` file
-
-4. **Restart Claude Desktop** to load the skill
-
-> **Note:** Claude Desktop does not have marketplace support. You'll need to manually download updates from the releases page.
 
 ## Usage
 
@@ -131,13 +103,14 @@ Results are automatically saved to `~/.claude-job-searches/`.
 
 ## Supported Platforms
 
-| Platform | URL Pattern | Status |
-|----------|-------------|--------|
-| LinkedIn Easy Apply | `linkedin.com/jobs/view/*` | Supported |
-| Greenhouse | `boards.greenhouse.io/*` | Supported |
-| Ashby | `jobs.ashbyhq.com/*` | Supported |
-| Workday | `*.myworkdayjobs.com/*` | Supported |
-| Lever | `jobs.lever.co/*` | Supported |
+| Platform | URL Pattern | Tool | Status |
+|----------|-------------|------|--------|
+| LinkedIn Easy Apply | `linkedin.com/jobs/view/*` | Chrome MCP | Supported |
+| Greenhouse | `boards.greenhouse.io/*` | Playwright MCP | Supported |
+| Ashby | `jobs.ashbyhq.com/*` | Playwright MCP | Supported |
+| Lever | `jobs.lever.co/*` | Playwright MCP | Supported |
+| Rippling | `*.rippling.com/*` | Playwright MCP | Supported |
+| Workday | `*.myworkdayjobs.com/*` | Playwright MCP | Supported |
 
 ## Profile Storage
 
