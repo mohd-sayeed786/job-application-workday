@@ -1,388 +1,379 @@
 ---
 name: job-search
-description: Search LinkedIn for jobs with connections and hiring manager insights. Use when the user wants to find jobs, search for positions, or explore job opportunities.
-allowed-tools: Read, Write, Bash, mcp__claude-in-chrome__*
+description: Search LinkedIn, Hacker News, and Twitter/X for jobs with connections, hiring manager insights, and preference-based scoring. Use when the user wants to find jobs, search for positions, or explore job opportunities.
+allowed-tools: Read, Write, Bash, WebSearch, WebFetch, mcp__claude-in-chrome__*, mcp__plugin_playwright_playwright__*
 ---
 
-# Job Search Assistant
+# Multi-Source Job Search
 
-A Claude Code skill for searching LinkedIn jobs with a focus on finding positions where you have network connections or hiring managers are listed.
-
-## Initial Prompt
-
-When this skill is invoked, first check if a profile exists at `~/.claude-job-profile.json`.
-
-**If NO profile exists**, say:
-
-> Welcome to the Job Search Assistant! I'll help you find jobs on LinkedIn where you have connections or hiring managers are listed.
->
-> First, I need to set up your profile so I can suggest relevant search terms based on your experience.
->
-> **Please provide the path to your resume file** (PDF, DOCX, or TXT).
->
-> For example: `~/Documents/resume.pdf` or `/Users/you/Desktop/MyResume.pdf`
-
-Then wait for the user to provide the path before proceeding with profile extraction.
-
-**If a profile DOES exist**, analyze it and present suggestions:
-
-> Welcome back! I found your profile at `~/.claude-job-profile.json`.
->
-> Based on your resume, here's what I suggest for your job search:
->
-> **Keywords**: [Most recent job title], [Related titles based on skills]
-> **Location**: [City, State from profile]
-> **Experience Level**: [Calculated level] ([X] years of experience)
->
-> Would you like to:
-> 1. Search with these suggestions
-> 2. Modify the keywords, location, or other filters
-> 3. Reset your profile from a new resume
->
-> Just let me know how you'd like to proceed!
+A Claude Code skill for searching jobs across LinkedIn, Hacker News Who's Hiring, and Twitter/X. Scores and ranks results against your saved preferences, highlights network advantages, and saves structured output.
 
 ---
 
-## Required Input
+## Phase 1: Load Preferences & Parse Overrides
 
-- **Resume file path**: Only if no profile exists at `~/.claude-job-profile.json`
+### Step 1: Load Profile
 
-## Auto-Inferred from Profile
+Read `~/.claude-job-profile.json`. Check for the `preferences` key.
 
-These values are automatically extracted from the user's profile and presented for confirmation:
+**If no preferences found**, say:
 
-- **Keywords**: Suggested from job titles in `workHistory` and `skills` array
-- **Location**: From `profile.location` (city, state)
-- **Experience Level**: Calculated from total years in `workHistory`
-  - 0-2 years: Entry level
-  - 2-5 years: Associate
-  - 5-10 years: Mid-Senior level
-  - 10+ years: Director/Executive
+> No search preferences found. Run `/job-preferences` first to set your target titles, salary range, and filters.
 
-## Optional Filters
+Then **STOP**. Do not prompt the user to set preferences inline.
 
-User can specify or modify:
+**If preferences exist**, load them:
 
-- **Work Type**: remote, hybrid, onsite, or all
-- **Posted Within**: 24 hours, past week, past month, or any time
-- **Max Results**: Number of jobs to analyze (default: 10, max: 25)
+```json
+{
+  "targetTitles": ["Staff AI Engineer", "Principal ML Engineer"],
+  "minBaseSalary": "$250K",
+  "remotePreference": "remote only",
+  "excludePatterns": ["junior", "associate", "intern", "entry level"],
+  "defaultTimeRange": "last week"
+}
+```
 
----
+### Step 2: Parse User Overrides
 
-## Profile Storage
+The user may pass overrides when invoking the skill:
 
-The profile is stored at `~/.claude-job-profile.json` and shared with the `/job-apply` skill. Run `/job-search reset profile` to re-extract from a new resume.
+- **Time range**: `last week`, `2 weeks`, `month` — overrides `defaultTimeRange`
+- **Source filter**: `linkedin`, `hn`, `twitter`, or any combination — limits which sources to query (default: all three)
+- **Keywords**: any additional keywords to use alongside `targetTitles`
 
-## Results Storage
+Display the active search config before proceeding:
 
-Search results are automatically saved to `~/.claude-job-searches/search-{timestamp}.json`. This enables:
-- Review of past searches
-- Easy reference for follow-up actions
-- Structured data for further analysis
-
----
-
-## Workflow
-
-### Phase 1: Profile & Keyword Setup
-
-1. **Check for existing profile** at `~/.claude-job-profile.json`
-2. **If no profile exists**:
-   - Request resume file path from user
-   - Read the resume file using the Read tool
-   - Extract structured data into profile format (same as job-apply skill):
-     - `firstName`, `lastName`, `email`, `phone`
-     - `location` (city, state, country, zip)
-     - `linkedInUrl`, `portfolioUrl`, `githubUrl`
-     - `workHistory[]`: array of { company, title, startDate, endDate, current, description }
-     - `education[]`: array of { school, degree, field, startDate, endDate, gpa }
-     - `skills[]`: array of skill strings
-   - Present extracted data to user for review
-   - Save confirmed profile to `~/.claude-job-profile.json`
-3. **Analyze profile** to generate search suggestions:
-   - Extract job titles from `workHistory` (most recent first)
-   - Identify key skills from `skills` array
-   - Generate related/adjacent job titles
-   - Calculate experience level from work history dates
-   - Extract location from profile
-4. **Present suggestions** to user with all inferred values
-5. **Let user confirm or modify** keywords, location, experience level
-6. **Collect additional preferences**: work type, recency filter
-7. **Confirm final search parameters** before proceeding
-
-### Phase 2: LinkedIn Navigation
-
-1. **Ensure browser context exists** using `tabs_context_mcp`
-2. **Create new tab** if needed using `tabs_create_mcp`
-3. **Navigate to LinkedIn Jobs**: `https://www.linkedin.com/jobs/`
-4. **Verify user is logged in**:
-   - Use `read_page` to check for profile menu or sign-in buttons
-   - If not logged in, STOP and instruct user: "Please log into LinkedIn in this browser tab, then let me know when you're ready."
-5. **Build search URL** with parameters (see LinkedIn URL Parameters below)
-6. **Navigate to search URL**
-7. **Wait for results to load** using `computer` with wait action (2-3 seconds)
-
-### Phase 3: Job Extraction
-
-For each job listing (up to maxResults):
-
-1. **Read job cards** from results list using `read_page`
-2. **Click into job detail page** using `computer` with left_click on job title
-3. **Wait for detail page to load** (1-2 seconds)
-4. **Extract job information**:
-   - Title, company name, location
-   - Posted date, applicant count
-   - Work type (Remote/Hybrid/On-site)
-   - Apply method (Easy Apply vs external)
-5. **Look for connection indicators**:
-   - Use `find` with query: "connections work here" or "connections at"
-   - Extract connection count and names if visible
-6. **Look for hiring team section**:
-   - Use `find` with query: "hiring team" or "Meet the hiring team"
-   - If found, extract hiring manager name, title, and profile URL
-7. **Store extracted data** in results array
-8. **Navigate back** to results list or click next job card
-9. **Add delay** between jobs (2-3 seconds to avoid rate limiting)
-
-### Phase 4: Results Processing
-
-1. **Sort results by priority**:
-   - Priority 1 (Highest): Jobs with hiring manager listed
-   - Priority 2: Jobs with 1st-degree connections
-   - Priority 3: Jobs with 2nd-degree or alumni connections
-   - Priority 4: Jobs with no network advantage
-2. **Create results directory** if needed: `~/.claude-job-searches/`
-3. **Save results to JSON file**: `~/.claude-job-searches/search-{ISO-timestamp}.json`
-4. **Display formatted summary** in terminal (see Output Format below)
-5. **Inform user** of saved file location
+> **Search config:**
+> - Titles: Staff AI Engineer, Principal ML Engineer
+> - Salary floor: $250K
+> - Remote: Remote only
+> - Exclude: junior, associate, intern, entry level
+> - Time range: last week
+> - Sources: LinkedIn, HN, Twitter
 
 ---
 
-## LinkedIn URL Parameters
+## Phase 2a: LinkedIn Search (Chrome MCP)
+
+### Navigation
+
+1. Get browser context using `tabs_context_mcp`
+2. Create a new tab using `tabs_create_mcp`
+3. Navigate to `https://www.linkedin.com/jobs/`
+4. Verify user is logged in — use `read_page` to check for profile menu. If not logged in, say: "Please log into LinkedIn in this browser tab, then let me know when you're ready." and **wait**.
+
+### Build Search URL
 
 Base URL: `https://www.linkedin.com/jobs/search/`
 
 | Parameter | Purpose | Values |
 |-----------|---------|--------|
-| `keywords` | Search terms | URL-encoded string |
-| `location` | Geographic area | City, state, or country name |
+| `keywords` | Search terms | URL-encoded from targetTitles |
+| `location` | Geographic area | From profile location |
 | `f_WT` | Work type | `1` (on-site), `2` (hybrid), `3` (remote) |
-| `f_TPR` | Time posted | `r86400` (24h), `r604800` (week), `r2592000` (month) |
-| `f_E` | Experience level | `1` (intern), `2` (entry), `3` (associate), `4` (mid-senior), `5` (director), `6` (executive) |
-| `f_JIYN` | In your network | `true` (shows jobs at companies with connections) |
-| `f_AL` | Actively hiring | `true` |
-| `f_EA` | Easy Apply only | `true` |
-| `sortBy` | Sort order | `DD` (date), `R` (relevance) |
+| `f_TPR` | Time posted | `r604800` (week), `r1209600` (2 weeks), `r2592000` (month) |
+| `f_E` | Experience level | `4` (mid-senior), `5` (director), `6` (executive) |
+| `f_JIYN` | In your network | `true` |
+| `sortBy` | Sort order | `DD` (date) |
 
-**Example URL:**
-```
-https://www.linkedin.com/jobs/search/?keywords=Senior%20Software%20Engineer&location=San%20Francisco%2C%20CA&f_WT=2%2C3&f_E=4&f_TPR=r604800&sortBy=DD
-```
+Map `remotePreference`:
+- "remote only" → `f_WT=3`
+- "remote preferred" → `f_WT=2,3`
+- "open to hybrid" → `f_WT=2,3`
+- "open to all" → omit `f_WT`
 
----
+Map time range:
+- "last week" → `f_TPR=r604800`
+- "2 weeks" → `f_TPR=r1209600`
+- "month" → `f_TPR=r2592000`
 
-## Chrome MCP Tool Usage
+### Extract Job Listings (max 25)
 
-### Checking Authentication
+For each job card:
 
-```
-Use read_page to look for:
-- Profile menu in top navigation (user is logged in)
-- "Sign in" or "Join now" buttons (user is NOT logged in)
-
-If not logged in, stop and inform user.
-```
-
-### Reading Job Listings
-
-```
-Use read_page with filter: "interactive" to see job cards
-Each job card typically contains:
-- Job title (clickable link)
-- Company name
-- Location
-- Posted date
-- Easy Apply badge (if applicable)
-```
-
-### Finding Connections
-
-```
-After clicking into job detail:
-1. Use find with query: "connections work here"
-2. Or use find with query: "connections at this company"
-3. Look for section showing connection profile pictures/names
-```
-
-### Finding Hiring Manager
-
-```
-After clicking into job detail:
-1. Use find with query: "Meet the hiring team"
-2. Or use find with query: "hiring manager"
-3. If found, extract:
-   - Name (usually in heading or profile card)
-   - Title (usually below name)
-   - Profile link (href on the card)
-```
+1. Use `read_page` to read job cards from results list
+2. Click into job detail page using `computer` with left_click
+3. Wait 2-3 seconds for detail page to load
+4. Extract: title, company, location, posted date, applicant count, work type, apply method
+5. Look for connection indicators — use `find` with query "connections work here" or "connections at"
+6. Look for hiring team — use `find` with query "Meet the hiring team" or "hiring manager"
+7. If hiring manager found, extract name, title, profile URL
+8. Store result, navigate back to results list
+9. **2-3 second delay** between each job
 
 ### Scrolling for More Results
 
-```
 LinkedIn uses infinite scroll:
-1. Use computer with action: "scroll", scroll_direction: "down"
-2. Wait 2-3 seconds for new results to load
-3. Use read_page to see newly loaded job cards
+1. Use `computer` with action "scroll", scroll_direction "down"
+2. Wait 2-3 seconds for new results
+3. Use `read_page` to see newly loaded cards
 4. Repeat until desired count or no more results
-```
 
 ---
 
-## Output Format
+## Phase 2b: Hacker News Who's Hiring (Bash + WebSearch)
 
-### Terminal Display
+### Find Current Thread
+
+1. Use `WebSearch` to search for: `"Ask HN: Who is hiring?" site:news.ycombinator.com {current_month} {current_year}`
+2. Extract the thread ID from the HN URL in the search results (e.g., `https://news.ycombinator.com/item?id=XXXXXXXX` → `XXXXXXXX`)
+
+If no thread found for the current month, try the previous month. If still nothing, skip HN and report it.
+
+### Fetch Comments via Firebase API
+
+3. Fetch the thread: `curl -s "https://hacker-news.firebaseio.com/v0/item/{THREAD_ID}.json"`
+4. Parse the `kids` array — these are top-level comment IDs (job postings)
+5. Fetch each comment (up to 50): `curl -s "https://hacker-news.firebaseio.com/v0/item/{COMMENT_ID}.json"`
+6. **0.5 second delay** between API calls
+
+### Parse Comments
+
+HN Who's Hiring comments typically follow this format in the `text` field:
 
 ```
-=== LinkedIn Job Search Results ===
-Search: "Senior Software Engineer" in San Francisco, CA
-Filters: Remote/Hybrid | Past Week | Mid-Senior Level
-Found: 12 jobs analyzed
-
-Saved to: ~/.claude-job-searches/search-2026-01-06T10-30-00.json
-
------------------------------------------------------------
-1. [HIRING MANAGER] Senior Software Engineer
-   Company: Acme Corp
-   Location: San Francisco, CA (Remote)
-   Posted: 2 days ago | 45 applicants
-
-   Hiring Manager: Jane Smith (Engineering Manager)
-   Connections: 2 (John Doe, Sarah Lee)
-
-   Apply: Easy Apply
-   URL: https://linkedin.com/jobs/view/123456
------------------------------------------------------------
-
-2. [CONNECTIONS] Staff Software Engineer
-   Company: TechStart Inc
-   Location: Palo Alto, CA (Hybrid)
-   Posted: 1 day ago | 23 applicants
-
-   Connections: 5 (including 2 Stanford alumni)
-
-   Apply: Easy Apply
-   URL: https://linkedin.com/jobs/view/789012
------------------------------------------------------------
-
-... (additional results)
-
-=== Summary ===
-- 2 jobs with hiring managers listed
-- 4 jobs with 1st-degree connections
-- 3 jobs with alumni connections
-- 3 jobs with no network advantage
+Company Name | Role Title | Location | Remote | Salary Range
+Description text...
+Apply: URL
 ```
 
-### JSON File Schema
+For each comment:
+- Extract company, title, location, remote status, salary from the first line (pipe-delimited)
+- Extract application URL if present (look for "apply" or "http" links)
+- Parse salary range if present (look for patterns like `$XXXk-$XXXk`, `$XXX,XXX`)
+- Extract the full text as description
 
-```json
-{
-  "searchMetadata": {
-    "keywords": "Senior Software Engineer",
-    "location": "San Francisco, CA",
-    "filters": {
-      "workType": ["remote", "hybrid"],
-      "postedWithin": "week",
-      "experienceLevel": "mid-senior"
-    },
-    "timestamp": "2026-01-06T10:30:00Z",
-    "totalJobsAnalyzed": 12
-  },
-  "jobs": [
-    {
-      "id": "123456",
-      "url": "https://linkedin.com/jobs/view/123456",
-      "title": "Senior Software Engineer",
-      "company": {
-        "name": "Acme Corp",
-        "linkedinUrl": "https://linkedin.com/company/acme-corp"
-      },
-      "location": "San Francisco, CA",
-      "workType": "remote",
-      "postedDate": "2 days ago",
-      "applicantCount": 45,
-      "applyMethod": "easyApply",
-      "hiringManager": {
-        "name": "Jane Smith",
-        "title": "Engineering Manager",
-        "profileUrl": "https://linkedin.com/in/janesmith"
-      },
-      "connections": [
-        {
-          "name": "John Doe",
-          "title": "Software Engineer",
-          "connectionDegree": 1,
-          "profileUrl": "https://linkedin.com/in/johndoe"
-        }
-      ],
-      "connectionSummary": {
-        "total": 2,
-        "firstDegree": 2,
-        "secondDegree": 0,
-        "alumni": 0
-      },
-      "priority": "high"
-    }
-  ],
-  "summary": {
-    "withHiringManager": 2,
-    "withFirstDegreeConnections": 4,
-    "withAlumniConnections": 3,
-    "noNetworkAdvantage": 3
-  }
-}
+### Filter Against Preferences
+
+Skip comments that:
+- Don't match any `targetTitles` (fuzzy match — "AI Engineer" matches "Staff AI Engineer")
+- Match any `excludePatterns`
+- Don't meet `remotePreference` (if "remote only", skip non-remote postings)
+- Fall below `minBaseSalary` (if salary is listed)
+
+---
+
+## Phase 2c: Twitter/X Search (Chrome MCP)
+
+### Navigation
+
+1. Use existing browser context (or create new tab)
+2. Navigate to `https://x.com/search`
+3. Verify logged in — use `read_page` to check for profile avatar or compose button. If not logged in, **skip Twitter entirely** and continue with other sources. Report: "Skipped Twitter — not logged in."
+
+### Build Search Query
+
+Construct a Twitter advanced search query:
+
 ```
+("hiring" OR "open role" OR "we're hiring" OR "join our team") ("AI engineer" OR "ML engineer" OR "{title1}" OR "{title2}") ("remote") since:YYYY-MM-DD -is:reply
+```
+
+Map time range to `since:` date:
+- "last week" → 7 days ago
+- "2 weeks" → 14 days ago
+- "month" → 30 days ago
+
+### Execute Search
+
+4. Navigate to the search URL with the query
+5. Wait for results to load (3 seconds)
+6. Switch to "Latest" tab if available
+7. Extract tweet content, author handle, engagement (likes/retweets), and any URLs (max 20 tweets)
+8. **2-3 second delays** between interactions
+
+### Filter Against Preferences
+
+Apply the same filtering as HN — title match, exclude patterns, remote, salary if mentioned.
+
+### Graceful Failure
+
+If Twitter is inaccessible, rate-limited, or not logged in — skip entirely and continue. Report which sources succeeded and failed at the end.
+
+---
+
+## Phase 3: LinkedIn Detail Extraction
+
+For LinkedIn results that passed initial filtering, extract additional network signals:
+
+1. Connection count and names (1st-degree, 2nd-degree, alumni)
+2. Hiring manager name, title, profile URL
+3. Easy Apply availability
+4. Applicant count and posting age
+
+This data feeds into the scoring in Phase 4.
+
+---
+
+## Phase 4: Cross-Source Scoring
+
+Score every result on a 0-100 normalized scale.
+
+### Scoring Rubric
+
+| Category | Points | Applies to |
+|----------|--------|-----------|
+| Title match (exact vs partial) | 0-20 | All sources |
+| Salary meets/exceeds floor | 0-10 | All sources |
+| Remote preference match | 0-10 | All sources |
+| Recency (newer = higher) | 0-5 | All sources |
+| Low competition (<50 applicants) | 0-5 | All sources |
+| Hiring manager listed | 20 | LinkedIn only |
+| 1st-degree connections | 15 | LinkedIn only |
+| 2nd-degree or alumni connections | 10 | LinkedIn only |
+| Easy Apply available | 5 | LinkedIn only |
+| Salary explicitly listed | 10 | HN only |
+| Application URL provided | 10 | HN only |
+| High engagement (50+ likes) | 10 | Twitter only |
+
+### Normalization
+
+Max possible per source: LinkedIn 100, HN 80, Twitter 70.
+
+Normalize all scores to 0-100:
+- LinkedIn score: `raw_score`
+- HN score: `raw_score * (100 / 80)`
+- Twitter score: `raw_score * (100 / 70)`
+
+Round to nearest integer. Sort all results by normalized score descending.
+
+---
+
+## Phase 5: Output
+
+### 1. Terminal Display
+
+```
+============================================================
+  Multi-Source Job Search Results
+============================================================
+  Titles: Staff AI Engineer, Principal ML Engineer
+  Filters: Remote only | Last week | Salary >= $250K
+  Sources: LinkedIn (12), HN (8), Twitter (5)
+  Total: 25 results | Showing top 25 by score
+============================================================
+
+Score | Source   | Title                        | Company       | Salary   | Location        | Signals
+----- | -------- | ---------------------------- | ------------- | -------- | --------------- | --------------------------
+  92  | LinkedIn | Staff AI Engineer            | Acme Corp     | $280K    | Remote          | Hiring mgr, 2 connections
+  87  | LinkedIn | Principal ML Engineer        | TechStart     | $300K    | SF (Remote OK)  | 5 connections, Easy Apply
+  81  | HN       | AI Engineer (Staff)          | CoolStartup   | $250-300K| Remote          | Salary listed, Apply URL
+  76  | Twitter  | Head of AI                   | DataCo        | —        | Remote          | 120 likes
+  ...
+
+============================================================
+  Summary
+  - 4 with hiring managers | 8 with connections
+  - 3 sources queried | 0 failed
+  - Saved to: ~/.claude-job-searches/search-2026-02-28T14-30-00.md
+============================================================
+```
+
+### 2. Markdown File
+
+Save full details to `~/.claude-job-searches/search-{timestamp}.md`:
+
+```markdown
+# Job Search Results — 2026-02-28
+
+## Search Parameters
+- Titles: Staff AI Engineer, Principal ML Engineer
+- Salary floor: $250K
+- Remote: Remote only
+- Time range: Last week
+- Sources: LinkedIn, HN, Twitter
+
+## Results (ranked by score)
+
+### 1. Staff AI Engineer — Acme Corp (Score: 92)
+- **Source**: LinkedIn
+- **Location**: Remote
+- **Salary**: $280K
+- **Posted**: 2 days ago | 45 applicants
+- **Hiring Manager**: Jane Smith (Engineering Manager) — linkedin.com/in/janesmith
+- **Connections**: 2 (John Doe, Sarah Lee)
+- **Apply**: Easy Apply
+- **URL**: https://linkedin.com/jobs/view/123456
+
+### 2. AI Engineer (Staff) — CoolStartup (Score: 81)
+- **Source**: Hacker News
+- **Location**: Remote
+- **Salary**: $250-300K
+- **Description**: Building next-gen AI infrastructure...
+- **Apply**: https://coolstartup.com/careers/ai-engineer
+
+...
+```
+
+Create the `~/.claude-job-searches/` directory if it doesn't exist.
+
+### 3. Queue Append (Optional, User Confirms)
+
+If any results scored 70+, ask the user:
+
+> **{N} jobs scored 70+.** Would you like me to add them to your application queue at `~/Desktop/jobs/application_queue.md`?
+
+If confirmed, append to `application_queue.md` under a new "## Tier 3 — Auto-Discovered" section:
+
+```markdown
+## Tier 3 — Auto-Discovered
+
+| Score | Source | Role | Company | URL | Status |
+|-------|--------|------|---------|-----|--------|
+| 92 | LinkedIn | Staff AI Engineer | Acme Corp | [link](https://...) | New |
+| 81 | HN | AI Engineer (Staff) | CoolStartup | [link](https://...) | New |
+```
+
+**Never modify application_queue.md without explicit user confirmation.**
 
 ---
 
 ## Safety Rules
 
-1. **Never enter credentials** - If login is required, stop and instruct user to log in manually
-2. **Never click Apply** - This skill is for searching only, not applying
-3. **Never create accounts** - Stop and inform user if account creation is required
-4. **Respect rate limits** - Add 2-3 second delays between page loads
-5. **Limit result count** - Maximum 25 jobs per search to avoid excessive scraping
-6. **Handle errors gracefully** - If a job page fails to load, skip and continue
+1. **Never enter credentials** — if login is required, stop and instruct user to log in manually
+2. **Never click Apply** — this skill is for searching only, not applying
+3. **Never create accounts** — stop and inform user if account creation is required
+4. **Respect rate limits per source**:
+   - LinkedIn: 2-3 second delays between page loads
+   - HN Firebase API: 0.5 second delays between requests
+   - Twitter: 2-3 second delays between interactions
+5. **Max results per source**: LinkedIn 25, HN 50 comments, Twitter 20 tweets
+6. **Graceful degradation** — if any source fails, skip it and continue with the others. Report which sources succeeded and which failed at the end.
+7. **Never modify application_queue.md without user confirmation**
+8. **HN Firebase API only** — never scrape the Hacker News website directly. Always use `https://hacker-news.firebaseio.com/v0/` endpoints.
+9. **Handle errors gracefully** — if a job page fails to load, skip and continue
 
 ---
 
 ## Example Invocations
 
-**New user (no profile):**
+**Standard search (all sources):**
 ```
 User: /job-search
-Claude: Welcome! Please provide your resume path to get started.
-User: ~/Documents/resume.pdf
-Claude: [Parses resume, presents suggestions]
-        Based on your resume, I suggest searching for "Product Manager" in Seattle, WA...
+Claude: [Loads preferences, searches LinkedIn + HN + Twitter, displays ranked results]
 ```
 
-**Returning user:**
+**With time range override:**
 ```
-User: /job-search
-Claude: Welcome back! Based on your profile, I suggest:
-        Keywords: "Senior Software Engineer", "Staff Engineer"
-        Location: San Francisco, CA
-        Experience: Mid-Senior (7 years)
-
-        Ready to search, or would you like to adjust?
-User: Search for remote only
-Claude: [Executes search with remote filter, displays results]
+User: /job-search 2 weeks
+Claude: [Uses 2-week time range instead of default]
 ```
 
-**With specific request:**
+**Single source:**
 ```
-User: /job-search for machine learning roles in NYC
-Claude: I'll search for machine learning roles in NYC. Based on your 5 years of experience,
-        I'll filter for Mid-Senior level. Any preference for remote/hybrid/onsite?
+User: /job-search hn
+Claude: [Searches only Hacker News Who's Hiring]
+```
+
+**Multiple source filter:**
+```
+User: /job-search linkedin hn
+Claude: [Searches LinkedIn and HN, skips Twitter]
+```
+
+**With extra keywords:**
+```
+User: /job-search agentic systems
+Claude: [Adds "agentic systems" to title-based keywords]
 ```
