@@ -36,7 +36,7 @@ AI-powered job application assistant that automatically fills out job applicatio
 
 ```bash
 claude plugin marketplace add neonwatty/job-apply-plugin
-claude plugin install job-apply-plugin@job-apply
+claude plugin install job-apply@neonwatty-plugins
 ```
 
 ## Usage
