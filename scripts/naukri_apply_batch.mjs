@@ -56,6 +56,8 @@ const candidatePaths = [
 
 const STORE_DIR = path.join(os.homedir(), ".job-apply");
 const answersFilePath = path.join(STORE_DIR, "answers.json");
+const APPLIED_FILE = path.join(STORE_DIR, "applied_jobs.json");
+const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes total
 
 function loadAnswersStore() {
   if (fs.existsSync(answersFilePath)) {
@@ -368,8 +370,12 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
   const STUCK_TIMEOUT_MS = 300000; // 5 minutes stuck watchdog
 
   while (true) {
-    if (sessionStartTime > 0 && Date.now() - sessionStartTime >= 180000) {
-      console.log("[3-MIN HARD STOP] Global 3 minutes reached. Stopping cleanly.");
+    if (jobPage.isClosed()) {
+      console.log("Job page closed by browser after application. Considering completed.");
+      return true;
+    }
+    if (sessionStartTime > 0 && Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS) {
+      console.log("[TIMEOUT] Global session timeout reached. Stopping cleanly.");
       return false;
     }
     const elapsedSinceProgress = Date.now() - lastProgressTime;
@@ -381,6 +387,7 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
     }
 
     let state;
+    try {
     try {
       state = await jobPage.evaluate(() => {
         const bodyText = document.body.innerText || "";
@@ -589,7 +596,16 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       continue;
     }
 
-    await jobPage.waitForTimeout(1000);
+      if (!jobPage.isClosed()) {
+        await jobPage.waitForTimeout(1000);
+      }
+    } catch (err) {
+      if (err.message && (err.message.includes("closed") || err.message.includes("Target"))) {
+        console.log("Job page closed during processing. Considering completed.");
+        return true;
+      }
+      throw err;
+    }
   }
 }
 
@@ -619,8 +635,8 @@ function matchesJobPreferences(card) {
 }
 
 async function main() {
-  const TARGET_JOBS_COUNT = 5;
-const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
+  const TARGET_JOBS_COUNT = 10;
+const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop after exactly 3 mins
   let appliedCount = 0;
 
   console.log(`Starting Batch Application Automation (Target: ${TARGET_JOBS_COUNT} jobs)`);
@@ -633,6 +649,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
     "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_salary",
     "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_candidate",
     "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_company",
+    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_recruiter_activity",
     "https://www.naukri.com/mnjuser/recommendedjobs"
   ];
   let currentFeedIndex = 0;
@@ -648,18 +665,30 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
 
   await recPage.waitForTimeout(3000);
 
-  const APPLIED_FILE = path.join(STORE_DIR, "applied_jobs.json");
   const appliedUrls = new Set();
+  const appliedCompanies = new Set([
+    "epam", "bean hr", "tavant", "tredence", "shell", "zs associates",
+    "huntingcube", "spectraforce", "avom", "equinix", "coupa"
+  ]);
   if (fs.existsSync(APPLIED_FILE)) {
     try {
       const d = JSON.parse(fs.readFileSync(APPLIED_FILE, "utf8"));
       (d.appliedUrls || []).forEach((u) => appliedUrls.add(u.split("?")[0]));
+      (d.appliedCompanies || []).forEach((c) => appliedCompanies.add(c.toLowerCase()));
     } catch {}
   }
-  function recordApplied(url) {
+  function recordApplied(url, company = "") {
     appliedUrls.add(url.split("?")[0]);
+    if (company) appliedCompanies.add(company.toLowerCase().trim());
     try {
-      fs.writeFileSync(APPLIED_FILE, JSON.stringify({ appliedUrls: Array.from(appliedUrls) }, null, 2));
+      fs.writeFileSync(
+        APPLIED_FILE,
+        JSON.stringify(
+          { appliedUrls: Array.from(appliedUrls), appliedCompanies: Array.from(appliedCompanies) },
+          null,
+          2
+        )
+      );
     } catch {}
   }
 
@@ -667,7 +696,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
   const processedIndices = new Set();
 
   while (appliedCount < TARGET_JOBS_COUNT) {
-    if (Date.now() - sessionStartTime >= 180000) {
+    if (Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS) {
       console.log("\n[3-MIN HARD STOP] Exactly 3 minutes elapsed. Stopping all processing cleanly.");
       break;
     }
@@ -684,22 +713,28 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
 
     // Scan cards, scroll if needed
     for (let scrollAttempt = 0; scrollAttempt < 15; scrollAttempt++) {
-      const cards = await recPage.evaluate(() => {
+      const cards = await recPage.evaluate(({ appliedList, companyList }) => {
         const s = document.getElementById("scrollableDiv");
         if (!s) return [];
         return Array.from(s.children).map((c, i) => {
           const txt = c.innerText || "";
+          const txtLower = txt.toLowerCase();
           const titleEl = c.querySelector(".text-title18Sb") || c.querySelector("h2") || c;
+          const link = c.querySelector("a[href*='job-listings-']");
+          const href = link ? link.href.split("?")[0] : null;
+          const isCompanyApplied = companyList.some((comp) => txtLower.includes(comp));
+          const isAlreadyApplied = txt.includes("Applied") || (href && appliedList.includes(href)) || isCompanyApplied;
           return {
             index: i,
             title: (titleEl.innerText || "").replace(/\n/g, " "),
+            href,
             snippet: txt.replace(/\n/g, " ").slice(0, 300),
             hasQuickApply: txt.includes("Quick apply"),
-            isApplied: txt.includes("Applied"),
+            isApplied: isAlreadyApplied,
             isEarly: txt.includes("Signal early interest")
           };
         });
-      });
+      }, { appliedList: Array.from(appliedUrls), companyList: Array.from(appliedCompanies) });
 
       for (const c of cards) {
         if (
@@ -708,6 +743,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
           !c.isApplied &&
           !c.isEarly &&
           c.title.length > 2 &&
+          (!c.href || !appliedUrls.has(c.href.split("?")[0])) &&
           matchesJobPreferences(c)
         ) {
           candidateCard = c;
@@ -776,7 +812,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
 
     if (appliedUrls.has(jobUrl)) {
       console.log("Already applied to this URL in this session. Skipping.");
-      await jobPage.close();
+      if (!jobPage.isClosed()) await jobPage.close();
       continue;
     }
 
@@ -784,7 +820,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
     const clicked = await findAndClickQuickApply(jobPage);
     if (!clicked) {
       console.log("Quick apply button not clickable on this page. Skipping to next job.");
-      await jobPage.close();
+      if (!jobPage.isClosed()) await jobPage.close();
       continue;
     }
 
@@ -804,58 +840,73 @@ const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
       success = true;
     } else {
       success = await solveChatbotDrawer(jobPage, sessionStartTime);
+      if (success === "RESTART") {
+        console.log("Restarting application for current job...");
+        const reClicked = await findAndClickQuickApply(jobPage);
+        if (reClicked) {
+          await jobPage.waitForTimeout(3000);
+          success = await solveChatbotDrawer(jobPage, sessionStartTime);
+        } else {
+          success = false;
+        }
+      }
     }
 
     if (success) {
       appliedCount++;
-      recordApplied(jobUrl);
+      recordApplied(jobUrl, candidateCard.title);
       console.log(`\n>>> Successfully applied to Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
 
-      if (appliedCount < TARGET_JOBS_COUNT && Date.now() - sessionStartTime < 180000) {
+      if (appliedCount < TARGET_JOBS_COUNT && Date.now() - sessionStartTime < GLOBAL_SESSION_TIMEOUT_MS && jobPage && !jobPage.isClosed()) {
         console.log("Checking for matching similar jobs on page...");
-        const similarJobs = await jobPage.evaluate((appliedList) => {
-          const links = Array.from(document.querySelectorAll("a[href*='job-listings-']"));
-          const matches = [];
-          for (const a of links) {
-            const href = a.href.split("?")[0];
-            const card = a.closest("div, article, section") || a;
-            const cardText = (card.innerText || "").toLowerCase();
-            if (
-              !appliedList.includes(href) &&
-              cardText.includes("quick apply") &&
-              !cardText.includes("applied")
-            ) {
-              matches.push({ url: a.href, text: a.innerText });
+        let similarJobs = [];
+        try {
+          similarJobs = await jobPage.evaluate((appliedList) => {
+            const links = Array.from(document.querySelectorAll("a[href*='job-listings-']"));
+            const matches = [];
+            for (const a of links) {
+              const href = a.href.split("?")[0];
+              const card = a.closest("div, article, section") || a;
+              const cardText = (card.innerText || "").toLowerCase();
+              if (
+                !appliedList.includes(href) &&
+                cardText.includes("quick apply") &&
+                !cardText.includes("applied")
+              ) {
+                matches.push({ url: a.href, text: a.innerText });
+              }
             }
-          }
-          return matches;
-        }, Array.from(appliedUrls));
+            return matches;
+          }, Array.from(appliedUrls));
 
-        let appliedSimilar = false;
-        for (const sim of similarJobs) {
-          if (Date.now() - sessionStartTime >= 180000 || appliedCount >= TARGET_JOBS_COUNT) break;
-          const simClean = sim.url.split("?")[0];
-          if (appliedUrls.has(simClean)) continue;
+          let appliedSimilar = false;
+          for (const sim of similarJobs) {
+            if (Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS || appliedCount >= TARGET_JOBS_COUNT) break;
+            const simClean = sim.url.split("?")[0];
+            if (appliedUrls.has(simClean)) continue;
 
-          console.log(`Opening matching similar job: ${sim.text} (${sim.url})...`);
-          await jobPage.goto(sim.url, { waitUntil: "domcontentloaded" });
-          await jobPage.waitForTimeout(3000);
-
-          const simClicked = await findAndClickQuickApply(jobPage);
-          if (simClicked) {
+            console.log(`Opening matching similar job: ${sim.text} (${sim.url})...`);
+            await jobPage.goto(sim.url, { waitUntil: "domcontentloaded" });
             await jobPage.waitForTimeout(3000);
-            const simOk = await solveChatbotDrawer(jobPage, sessionStartTime);
-            if (simOk) {
-              appliedCount++;
-              recordApplied(sim.url);
-              console.log(`\n>>> Successfully applied to Similar Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
-              appliedSimilar = true;
-              break;
+
+            const simClicked = await findAndClickQuickApply(jobPage);
+            if (simClicked) {
+              await jobPage.waitForTimeout(3000);
+              const simOk = await solveChatbotDrawer(jobPage, sessionStartTime);
+              if (simOk) {
+                appliedCount++;
+                recordApplied(sim.url);
+                console.log(`\n>>> Successfully applied to Similar Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
+                appliedSimilar = true;
+                break;
+              }
             }
           }
-        }
-        if (!appliedSimilar) {
-          console.log("No more matching similar jobs on this page. Returning to searching for jobs page...");
+          if (!appliedSimilar) {
+            console.log("No more matching similar jobs on this page. Returning to searching for jobs page...");
+          }
+        } catch (simErr) {
+          console.log("Could not inspect similar jobs (page closed or redirected). Returning to search feed...");
         }
       }
     } else {
