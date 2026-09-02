@@ -54,7 +54,8 @@ const candidatePaths = [
   { type: "css", path: "button:has(span.flex.items-center.gap-2\\.5)" }
 ];
 
-const answersFilePath = path.join(os.homedir(), ".job-apply", "answers.json");
+const STORE_DIR = path.join(os.homedir(), ".job-apply");
+const answersFilePath = path.join(STORE_DIR, "answers.json");
 
 function loadAnswersStore() {
   if (fs.existsSync(answersFilePath)) {
@@ -359,7 +360,7 @@ async function findAndClickQuickApply(jobPage) {
   return true;
 }
 
-async function solveChatbotDrawer(jobPage) {
+async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
   console.log("Monitoring and answering chatbot screening questions (5 mins stuck watchdog)...");
   let lastProgressTime = Date.now();
   let startTime = Date.now();
@@ -367,6 +368,10 @@ async function solveChatbotDrawer(jobPage) {
   const STUCK_TIMEOUT_MS = 300000; // 5 minutes stuck watchdog
 
   while (true) {
+    if (sessionStartTime > 0 && Date.now() - sessionStartTime >= 180000) {
+      console.log("[3-MIN HARD STOP] Global 3 minutes reached. Stopping cleanly.");
+      return false;
+    }
     const elapsedSinceProgress = Date.now() - lastProgressTime;
     const elapsedTotal = Date.now() - startTime;
 
@@ -615,12 +620,22 @@ function matchesJobPreferences(card) {
 
 async function main() {
   const TARGET_JOBS_COUNT = 5;
+const GLOBAL_SESSION_TIMEOUT_MS = 180000; // Stop after exactly 3 mins
   let appliedCount = 0;
 
   console.log(`Starting Batch Application Automation (Target: ${TARGET_JOBS_COUNT} jobs)`);
   console.log("Connecting to Chrome on port 53178...");
   const browser = await chromium.connectOverCDP("http://127.0.0.1:53178", { noDefaults: true });
   const context = browser.contexts()[0];
+
+  
+  const SEARCH_FEEDS = [
+    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_salary",
+    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_candidate",
+    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_company",
+    "https://www.naukri.com/mnjuser/recommendedjobs"
+  ];
+  let currentFeedIndex = 0;
 
   let recPage = context.pages().find((p) => p.url().includes("recommendedjobs"));
   if (!recPage) {
@@ -633,10 +648,30 @@ async function main() {
 
   await recPage.waitForTimeout(3000);
 
+  const APPLIED_FILE = path.join(STORE_DIR, "applied_jobs.json");
   const appliedUrls = new Set();
+  if (fs.existsSync(APPLIED_FILE)) {
+    try {
+      const d = JSON.parse(fs.readFileSync(APPLIED_FILE, "utf8"));
+      (d.appliedUrls || []).forEach((u) => appliedUrls.add(u.split("?")[0]));
+    } catch {}
+  }
+  function recordApplied(url) {
+    appliedUrls.add(url.split("?")[0]);
+    try {
+      fs.writeFileSync(APPLIED_FILE, JSON.stringify({ appliedUrls: Array.from(appliedUrls) }, null, 2));
+    } catch {}
+  }
+
+  const sessionStartTime = Date.now();
   const processedIndices = new Set();
 
   while (appliedCount < TARGET_JOBS_COUNT) {
+    if (Date.now() - sessionStartTime >= 180000) {
+      console.log("\n[3-MIN HARD STOP] Exactly 3 minutes elapsed. Stopping all processing cleanly.");
+      break;
+    }
+
     console.log(`\n======================================================`);
     console.log(`LOOKING FOR JOB #${appliedCount + 1} OF ${TARGET_JOBS_COUNT}...`);
     console.log(`======================================================`);
@@ -692,8 +727,16 @@ async function main() {
     }
 
     if (!candidateCard) {
-      console.log("No more matching unapplied Quick Apply jobs found in recommendedjobs.");
-      break;
+      currentFeedIndex++;
+      if (currentFeedIndex < SEARCH_FEEDS.length) {
+        console.log(`Switching to search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
+        await recPage.goto(SEARCH_FEEDS[currentFeedIndex], { waitUntil: "domcontentloaded" });
+        await recPage.waitForTimeout(3000);
+        continue;
+      } else {
+        console.log("No more matching unapplied Quick Apply jobs found across search feeds.");
+        break;
+      }
     }
 
     processedIndices.add(candidateCard.index);
@@ -760,20 +803,69 @@ async function main() {
       console.log("Job applied directly without screening questions!");
       success = true;
     } else {
-      success = await solveChatbotDrawer(jobPage);
+      success = await solveChatbotDrawer(jobPage, sessionStartTime);
     }
 
     if (success) {
       appliedCount++;
-      appliedUrls.add(jobUrl);
+      recordApplied(jobUrl);
       console.log(`\n>>> Successfully applied to Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
+
+      if (appliedCount < TARGET_JOBS_COUNT && Date.now() - sessionStartTime < 180000) {
+        console.log("Checking for matching similar jobs on page...");
+        const similarJobs = await jobPage.evaluate((appliedList) => {
+          const links = Array.from(document.querySelectorAll("a[href*='job-listings-']"));
+          const matches = [];
+          for (const a of links) {
+            const href = a.href.split("?")[0];
+            const card = a.closest("div, article, section") || a;
+            const cardText = (card.innerText || "").toLowerCase();
+            if (
+              !appliedList.includes(href) &&
+              cardText.includes("quick apply") &&
+              !cardText.includes("applied")
+            ) {
+              matches.push({ url: a.href, text: a.innerText });
+            }
+          }
+          return matches;
+        }, Array.from(appliedUrls));
+
+        let appliedSimilar = false;
+        for (const sim of similarJobs) {
+          if (Date.now() - sessionStartTime >= 180000 || appliedCount >= TARGET_JOBS_COUNT) break;
+          const simClean = sim.url.split("?")[0];
+          if (appliedUrls.has(simClean)) continue;
+
+          console.log(`Opening matching similar job: ${sim.text} (${sim.url})...`);
+          await jobPage.goto(sim.url, { waitUntil: "domcontentloaded" });
+          await jobPage.waitForTimeout(3000);
+
+          const simClicked = await findAndClickQuickApply(jobPage);
+          if (simClicked) {
+            await jobPage.waitForTimeout(3000);
+            const simOk = await solveChatbotDrawer(jobPage, sessionStartTime);
+            if (simOk) {
+              appliedCount++;
+              recordApplied(sim.url);
+              console.log(`\n>>> Successfully applied to Similar Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
+              appliedSimilar = true;
+              break;
+            }
+          }
+        }
+        if (!appliedSimilar) {
+          console.log("No more matching similar jobs on this page. Returning to searching for jobs page...");
+        }
+      }
     } else {
       console.log(`Application was not confirmed for ${jobUrl}.`);
     }
 
     // Close job tab to keep workspace clean
     await jobPage.close().catch(() => {});
-    await recPage.waitForTimeout(2000);
+    await recPage.bringToFront();
+    await recPage.waitForTimeout(1500);
   }
 
   console.log(`\n======================================================`);
