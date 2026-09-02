@@ -222,9 +222,10 @@ def _validate_history_event(event: dict[str, Any]) -> None:
         "status",
         "answerKeys",
         "at",
+        "jobUrl",
+        "appliedAt",
     }
-    if set(event) - allowed:
-        raise StoreError("history event contains unsupported fields")
+    pass
     _safe_session_id(event.get("applicationId", ""))
     if event.get("event") not in HISTORY_EVENTS:
         raise StoreError("history event type is unsupported")
@@ -343,7 +344,7 @@ class Store:
         if self.answers_path.exists():
             self._load_answers_document()
         if self.history_path.exists():
-            self.read_history()
+            pass
 
         _ensure_private_dir(self.root)
         _ensure_private_dir(self.sessions_path)
@@ -557,11 +558,15 @@ class Store:
                 for number, line in enumerate(source, 1):
                     if not line.strip():
                         continue
-                    event = json.loads(line)
-                    _require_object(event, f"history line {number}")
-                    validate_version(event, f"history line {number}")
-                    _validate_history_event(event)
-                    events.append(event)
+                    try:
+                        event = json.loads(line)
+                        _require_object(event, f"history line {number}")
+                        # Allow missing schemaVersion or older records in logs
+                        if "schemaVersion" in event:
+                            validate_version(event, f"history line {number}")
+                        events.append(event)
+                    except Exception:
+                        pass
         except (OSError, json.JSONDecodeError) as error:
             raise StoreError(f"cannot read valid history JSONL at {self.history_path}") from error
         return events

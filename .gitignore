@@ -21,3 +21,10 @@ test_resumes/
 # Private Job Apply QA recordings and local run evidence
 .qa-private/
 qa/runs/
+runs_data/
+
+# Sensitive temp files
+*.pdf
+*.bak
+profile_temp.json
+pending_naukri_questions.json
