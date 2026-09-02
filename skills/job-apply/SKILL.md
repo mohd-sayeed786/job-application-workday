@@ -1,12 +1,12 @@
 ---
 name: job-apply
-description: Fill out job applications automatically using your resume. Use when the user wants to apply for jobs on LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, or Workday.
+description: Fill out job applications automatically using your resume. Use when the user wants to apply for jobs on LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, Workday, or Naukri.
 allowed-tools: Read, Write, Bash, mcp__claude-in-chrome__*, mcp__plugin_playwright_playwright__*
 ---
 
 # Job Application Assistant
 
-A Codex and Claude Code skill for filling job applications on LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, and Workday using visible browser automation.
+A Codex and Claude Code skill for filling job applications on LinkedIn Easy Apply, Greenhouse, Ashby, Lever, Rippling, Workday, and Naukri using visible browser automation.
 
 ## Initial Prompt
 
@@ -20,7 +20,7 @@ After evaluation, or if the QA replay is abandoned, run `python3 "<plugin-root>/
 
 **If the returned profile object is empty**, say:
 
-> Welcome to the Job Application Assistant! I'll help you fill out job applications on LinkedIn, Greenhouse, Ashby, Lever, Rippling, and Workday.
+> Welcome to the Job Application Assistant! I'll help you fill out job applications on LinkedIn, Greenhouse, Ashby, Lever, Rippling, Workday, and Naukri.
 >
 > First, I need to set up your profile. This is a one-time process — your information will be saved for future applications.
 >
@@ -248,6 +248,46 @@ User confirmation never authorizes this skill to click Submit, Send, or any equi
 - Workday dropdowns: Click field → wait → read the visible options → click the supported option
 - Date pickers: Often format-sensitive, try MM/DD/YYYY
 - Required fields marked with asterisk or red border after validation
+
+### Naukri Quick Apply & Screening Chatbot
+
+**Characteristics:**
+- Modal drawer (`#desktopChatBotContainer` or right-side chatbot drawer `.chatbot_Drawer`) asking screening questions sequentially.
+- Two distinct question interaction types: **Radio Button / Choice Questions** and **Text-Based Questions**.
+- Even when radio buttons are present, a text input area may remain visible in the drawer footer.
+
+**Quick Apply Button Detection Paths:**
+The Quick Apply button on job pages appears in multiple locations depending on the layout. Check all candidate paths before clicking:
+1. `/html/body/div[4]/div/div/div/div[1]/div[5]/div/div/div/button/span/span[1]/span`
+2. `/html/body/div[4]/div/div/div/div[1]/div[6]/div/div/div/button/span/span[1]/span`
+3. `/html/body/div[4]/div/div/div/div[1]/div[4]/div/div/div/button/span/span[1]/span`
+4. `/html/body/div[4]/div/div/div/div[1]/div[7]/div/div/div/button/span/span[1]/span`
+5. `<span class="flex items-center gap-2.5">Quick apply</span>`
+6. `button:has(span.flex.items-center.gap-2\.5)`
+7. `//button[.//span[normalize-space()="Quick apply"]]`
+Always scroll the matched element into view, verify bounding rect dimensions, and dispatch clicks both via mouse coordinates and element click on the button.
+
+**Approach & Strict Interaction Rules:**
+1. **Radio Button / Option Questions:**
+   - Detect radio buttons (`input[type="radio"]`, `[role="radio"]`, `label.ssrc__label`, `label.mcc__label`, `[class*="radio"]`, `.chipMsg`, `.quickReply`, chips).
+   - If radio buttons or choice options are present for the question:
+     - Select the matching radio button / option directly.
+     - **CRITICAL NOTE:** DO NOT click on the text place / box if a radio button is encountered! Never dispatch clicks or focus to `.textArea`, `[contenteditable="true"]`, or `input[type="text"]`. Clicking the text area breaks or overrides the radio selection.
+     - Click "Save" (`.sendMsg`) only if a separate confirmation Save button is present and active.
+2. **Text-Based Questions:**
+   - If and ONLY if NO radio buttons or choice options are encountered:
+     - Click on the text box (`.textArea`, `div.textArea[contenteditable="true"]`, `textarea`, `input[type="text"]`).
+     - Type the appropriate answer.
+     - Click "Save" or "Send".
+3. **Experience Question Answering Policy:**
+   - Any question on experience (overall or skill-specific): **ALWAYS answer >= 7 years** (e.g. `>7`, `7-8`, `7-9`, `7+`, `8+`, `>12 years`).
+   - **STRICT PROHIBITION**: NEVER select `<7`, `<5`, `<3`, or `No experience`. Under no circumstances should the first option be defaulted to if it is `No experience`.
+   - When options are ranges:
+     - First filter out any option containing `No experience`, `None`, or starting with `<`.
+     - Select ranges covering 7 or higher (`7-9 years`, `7-8`, `7+`, `>7`, `>6 years`, `>5 years`, or `>12 years`).
+     - If no explicit 7+ option is present, always select the highest available valid positive range (the last valid non-negative option, e.g. `>6 years`), never negative or entry-level options.
+4. **Stuck / Watchdog Guard:**
+   - Track progress timestamps. If the chatbot flow or screening questions do not advance for more than 1 minute (60 seconds), stop cleanly immediately.
 
 ---
 
