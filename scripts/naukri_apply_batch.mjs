@@ -633,34 +633,39 @@ function matchesJobPreferences(card) {
 
   return priorityKeywords.some((pk) => full.includes(pk));
 }
-
 async function main() {
-  const TARGET_JOBS_COUNT = 10;
-const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop after exactly 3 mins
+  const TARGET_JOBS_COUNT = parseInt(process.env.TARGET_JOBS_COUNT || "5", 10);
+  const GLOBAL_SESSION_TIMEOUT_MS = parseInt(process.env.GLOBAL_SESSION_TIMEOUT_MS || "300000", 10); // 2 minutes
   let appliedCount = 0;
 
-  console.log(`Starting Batch Application Automation (Target: ${TARGET_JOBS_COUNT} jobs)`);
+  console.log(`Starting Batch Application Automation (Target: ${TARGET_JOBS_COUNT} jobs, Timeout: ${GLOBAL_SESSION_TIMEOUT_MS / 1000}s)`);
   console.log("Connecting to Chrome on port 53178...");
   const browser = await chromium.connectOverCDP("http://127.0.0.1:53178", { noDefaults: true });
   const context = browser.contexts()[0];
 
-  
   const SEARCH_FEEDS = [
+    "https://www.naukri.com/lead-data-scientist-jobs-in-bengaluru?k=lead%20data%20scientist&l=bengaluru",
+    "https://www.naukri.com/ai-engineer-jobs-in-bengaluru?k=ai%20engineer&l=bengaluru",
+    "https://www.naukri.com/ml-engineer-jobs-in-bengaluru?k=ml%20engineer&l=bengaluru",
+    "https://www.naukri.com/machine-learning-engineer-jobs-in-bengaluru?k=machine%20learning%20engineer&l=bengaluru",
+    "https://www.naukri.com/senior-data-scientist-jobs-in-bengaluru?k=senior%20data%20scientist&l=bengaluru",
     "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_salary",
     "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_candidate",
-    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_company",
-    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_recruiter_activity",
     "https://www.naukri.com/mnjuser/recommendedjobs"
   ];
   let currentFeedIndex = 0;
 
-  let recPage = context.pages().find((p) => p.url().includes("recommendedjobs"));
+  let recPage = context.pages().find((p) => p.url().includes("naukri.com"));
   if (!recPage) {
-    console.log("Opening recommendedjobs page...");
+    console.log(`Opening search feed: ${SEARCH_FEEDS[0]}...`);
     recPage = await context.newPage();
-    await recPage.goto("https://www.naukri.com/mnjuser/recommendedjobs", { waitUntil: "domcontentloaded" });
+    await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
   } else {
     await recPage.bringToFront();
+    if (!SEARCH_FEEDS.some((f) => recPage.url().includes(f.split("?")[0]))) {
+      console.log(`Navigating to search feed: ${SEARCH_FEEDS[0]}...`);
+      await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
+    }
   }
 
   await recPage.waitForTimeout(3000);
@@ -670,25 +675,39 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
     "epam", "bean hr", "tavant", "tredence", "shell", "zs associates",
     "huntingcube", "spectraforce", "avom", "equinix", "coupa"
   ]);
+  let appliedJobsList = [];
   if (fs.existsSync(APPLIED_FILE)) {
     try {
       const d = JSON.parse(fs.readFileSync(APPLIED_FILE, "utf8"));
       (d.appliedUrls || []).forEach((u) => appliedUrls.add(u.split("?")[0]));
       (d.appliedCompanies || []).forEach((c) => appliedCompanies.add(c.toLowerCase()));
+      if (Array.isArray(d.appliedJobs)) appliedJobsList = d.appliedJobs;
     } catch {}
   }
-  function recordApplied(url, company = "") {
-    appliedUrls.add(url.split("?")[0]);
+  function recordApplied(url, title = "", company = "") {
+    const cleanUrl = url.split("?")[0];
+    appliedUrls.add(cleanUrl);
     if (company) appliedCompanies.add(company.toLowerCase().trim());
+    appliedJobsList.push({
+      url: cleanUrl,
+      title: title || "",
+      company: company || "",
+      appliedAt: new Date().toISOString()
+    });
+    const dataToWrite = {
+      appliedUrls: Array.from(appliedUrls),
+      appliedCompanies: Array.from(appliedCompanies),
+      appliedJobs: appliedJobsList
+    };
     try {
-      fs.writeFileSync(
-        APPLIED_FILE,
-        JSON.stringify(
-          { appliedUrls: Array.from(appliedUrls), appliedCompanies: Array.from(appliedCompanies) },
-          null,
-          2
-        )
-      );
+      fs.writeFileSync(APPLIED_FILE, JSON.stringify(dataToWrite, null, 2));
+      console.log(`[STORED APPLIED JOB] Saved to ${APPLIED_FILE}: "${title}" (${company})`);
+    } catch (e) {
+      console.warn("Could not write to APPLIED_FILE:", e.message);
+    }
+    try {
+      const repoReport = path.join(process.cwd(), "runs_data", "naukri_applied_jobs.json");
+      fs.writeFileSync(repoReport, JSON.stringify(dataToWrite, null, 2));
     } catch {}
   }
 
@@ -697,7 +716,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
 
   while (appliedCount < TARGET_JOBS_COUNT) {
     if (Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS) {
-      console.log("\n[3-MIN HARD STOP] Exactly 3 minutes elapsed. Stopping all processing cleanly.");
+      console.log("\n[5-MIN HARD STOP] Exactly 5 minutes elapsed. Stopping all processing cleanly.");
       break;
     }
 
@@ -705,7 +724,6 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
     console.log(`LOOKING FOR JOB #${appliedCount + 1} OF ${TARGET_JOBS_COUNT}...`);
     console.log(`======================================================`);
 
-    // Ensure we are on recommendedjobs page
     await recPage.bringToFront();
     await recPage.waitForTimeout(2000);
 
@@ -715,18 +733,31 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
     for (let scrollAttempt = 0; scrollAttempt < 15; scrollAttempt++) {
       const cards = await recPage.evaluate(({ appliedList, companyList }) => {
         const s = document.getElementById("scrollableDiv");
-        if (!s) return [];
-        return Array.from(s.children).map((c, i) => {
+        const cardElements = s
+          ? Array.from(s.children)
+          : Array.from(document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800"));
+        if (!cardElements || cardElements.length === 0) return [];
+        return cardElements.map((c, i) => {
           const txt = c.innerText || "";
           const txtLower = txt.toLowerCase();
-          const titleEl = c.querySelector(".text-title18Sb") || c.querySelector("h2") || c;
+          const titleEl =
+            c.querySelector(".text-title18Sb.text-n100") ||
+            c.querySelector(".text-title18Sb") ||
+            c.querySelector("h2") ||
+            c;
+          const compEl =
+            c.querySelector(".text-title18Sb.text-n200") ||
+            c.querySelector(".text-title16Sb.text-n200") ||
+            c.querySelector("h4");
+          const company = compEl ? (compEl.innerText || "").split("\n")[0].trim() : "";
           const link = c.querySelector("a[href*='job-listings-']");
           const href = link ? link.href.split("?")[0] : null;
-          const isCompanyApplied = companyList.some((comp) => txtLower.includes(comp));
+          const isCompanyApplied = company && companyList.some((comp) => comp.length > 2 && txtLower.includes(comp));
           const isAlreadyApplied = txt.includes("Applied") || (href && appliedList.includes(href)) || isCompanyApplied;
           return {
             index: i,
             title: (titleEl.innerText || "").replace(/\n/g, " "),
+            company,
             href,
             snippet: txt.replace(/\n/g, " ").slice(0, 300),
             hasQuickApply: txt.includes("Quick apply"),
@@ -753,7 +784,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
 
       if (candidateCard) break;
 
-      console.log("No unapplied matching job in current view. Scrolling scrollableDiv...");
+      console.log("No unapplied matching job in current view. Scrolling...");
       await recPage.evaluate(() => {
         const s = document.getElementById("scrollableDiv");
         if (s) s.scrollBy(0, 700);
@@ -765,6 +796,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
     if (!candidateCard) {
       currentFeedIndex++;
       if (currentFeedIndex < SEARCH_FEEDS.length) {
+        processedIndices.clear();
         console.log(`Switching to search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
         await recPage.goto(SEARCH_FEEDS[currentFeedIndex], { waitUntil: "domcontentloaded" });
         await recPage.waitForTimeout(3000);
@@ -784,8 +816,9 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
     // Scroll card into view and click
     await recPage.evaluate((idx) => {
       const s = document.getElementById("scrollableDiv");
-      if (s && s.children[idx]) {
-        s.children[idx].scrollIntoView({ block: "center" });
+      const card = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800")[idx];
+      if (card) {
+        card.scrollIntoView({ block: "center" });
       }
     }, candidateCard.index);
     await recPage.waitForTimeout(600);
@@ -794,9 +827,15 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
 
     await recPage.evaluate((idx) => {
       const s = document.getElementById("scrollableDiv");
-      const c = s.children[idx];
-      const t = c.querySelector(".text-title18Sb") || c.querySelector("h2") || c;
-      t.click();
+      const c = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800")[idx];
+      if (c) {
+        const t =
+          c.querySelector(".text-title18Sb.text-n100") ||
+          c.querySelector(".text-title18Sb") ||
+          c.querySelector("h2") ||
+          c;
+        t.click();
+      }
     }, candidateCard.index);
 
     const jobPage = await newPagePromise;
@@ -854,7 +893,7 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
 
     if (success) {
       appliedCount++;
-      recordApplied(jobUrl, candidateCard.title);
+      recordApplied(jobUrl, candidateCard.title, candidateCard.company);
       console.log(`\n>>> Successfully applied to Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
 
       if (appliedCount < TARGET_JOBS_COUNT && Date.now() - sessionStartTime < GLOBAL_SESSION_TIMEOUT_MS && jobPage && !jobPage.isClosed()) {
@@ -913,6 +952,10 @@ const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes for 10 jobs // Stop afte
       console.log(`Application was not confirmed for ${jobUrl}.`);
     }
 
+    // Delay 2 seconds before closing tab
+    if (!jobPage.isClosed()) {
+      await jobPage.waitForTimeout(2000);
+    }
     // Close job tab to keep workspace clean
     await jobPage.close().catch(() => {});
     await recPage.bringToFront();
