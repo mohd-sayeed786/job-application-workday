@@ -21,6 +21,7 @@ const CANDIDATE_PROFILE = {
   variableCTC: "3.7",
   expectedCTC: "50",
   noticePeriod: "30 days",
+  holdingOffer: "No",
   reasonForChange: "Career growth",
   education: {
     tenthYear: "2012",
@@ -51,13 +52,45 @@ const candidatePaths = [
   { type: "xpath", path: "//button[.//span[normalize-space()='Quick apply']]" },
   { type: "xpath", path: "//span[normalize-space()='Quick apply' and contains(@class,'gap-2.5')]" },
   { type: "css", path: "span.flex.items-center.gap-2\\.5" },
-  { type: "css", path: "button:has(span.flex.items-center.gap-2\\.5)" }
+  { type: "css", path: "button:has(span.flex.items-center.gap-2\\.5)" },
+  { type: "xpath", path: "//button[contains(., 'Quick apply') and not(contains(., 'Applied'))]" },
+  { type: "xpath", path: "//button[contains(., 'Quick apply')]" },
+  { type: "css", path: "button#quick-apply-button" }
 ];
 
 const STORE_DIR = path.join(os.homedir(), ".job-apply");
 const answersFilePath = path.join(STORE_DIR, "answers.json");
 const APPLIED_FILE = path.join(STORE_DIR, "applied_jobs.json");
-const GLOBAL_SESSION_TIMEOUT_MS = 600000; // 10 minutes total
+const ENCOUNTERED_QUESTIONS_FILE = path.join(process.cwd(), "runs_data", "last_batch_questions.json");
+
+const encounteredQuestions = [];
+
+function recordEncountered(jobTitle, company, question, answer, type = "auto") {
+  if (!question || question.length < 3) return;
+  const existing = encounteredQuestions.find(
+    (e) => e.question.toLowerCase() === question.toLowerCase() && e.company === company
+  );
+  if (!existing) {
+    encounteredQuestions.push({
+      jobTitle,
+      company,
+      question: question.trim(),
+      answer: String(answer).trim(),
+      type,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+function saveEncounteredQuestions() {
+  try {
+    const dir = path.dirname(ENCOUNTERED_QUESTIONS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(ENCOUNTERED_QUESTIONS_FILE, JSON.stringify(encounteredQuestions, null, 2), "utf-8");
+  } catch (e) {
+    console.warn("Could not save encountered questions:", e.message);
+  }
+}
 
 function loadAnswersStore() {
   if (fs.existsSync(answersFilePath)) {
@@ -111,13 +144,39 @@ function getPersistedAnswer(question) {
       if (rq === question.trim().toLowerCase() || cleanQ.includes(rq) || rq.includes(cleanQ)) {
         return rec.value;
       }
+      if (rec.aliases && Array.isArray(rec.aliases)) {
+        if (rec.aliases.some((al) => cleanQ.includes(al.toLowerCase()) || al.toLowerCase().includes(cleanQ))) {
+          return rec.value;
+        }
+      }
     }
   } catch (e) {}
   return null;
 }
 
-function matchExperienceOption(options, userExp = 7) {
+function matchExperienceOption(options, userExp = 7.5) {
   if (!options || options.length === 0) return null;
+
+  // STRICT USER DIRECTIVE: If 6-7 and 7-8 are options, strictly select 7-8!
+  const sevenToEight = options.find((o) => {
+    const ol = o.toLowerCase();
+    return (
+      ol.includes("7-8") ||
+      ol.includes("7 to 8") ||
+      ol.includes("7-9") ||
+      ol.includes("7 to 9") ||
+      ol.includes("7+") ||
+      ol.includes(">=7") ||
+      ol.includes(">7")
+    );
+  });
+  const sixToSeven = options.find((o) => {
+    const ol = o.toLowerCase();
+    return ol.includes("6-7") || ol.includes("6 to 7") || ol.includes("<7");
+  });
+  if (sevenToEight && sixToSeven) {
+    return sevenToEight;
+  }
 
   const parsed = options.map((opt) => {
     const o = opt.trim();
@@ -126,7 +185,7 @@ function matchExperienceOption(options, userExp = 7) {
     if (ol === "yes") return { opt, min: 0, max: 99 };
     if (ol === "no" || ol.includes("no experience") || ol.includes("none")) return { opt, min: -1, max: -1 };
 
-    // Range like "5-7", "5 - 7 years", "6 to 8", "5-10"
+    // Range like "5-7", "5 - 7 years", "6 to 8", "5-10", "7-9", "7-8"
     const rangeMatch = ol.match(/(\d+)\s*(?:-|to)\s*(\d+)/);
     if (rangeMatch) {
       return { opt, min: parseInt(rangeMatch[1], 10), max: parseInt(rangeMatch[2], 10) };
@@ -182,7 +241,14 @@ function isDescriptiveQuestion(qText) {
     q.includes("current designation") ||
     q.includes("current location") ||
     q.includes("preferred location") ||
-    q.includes("highest qualification")
+    q.includes("highest qualification") ||
+    q.includes("product based") ||
+    q.includes("service based") ||
+    q.includes("offer") ||
+    q.includes("military") ||
+    q.includes("associated") ||
+    q.includes("sponsorship") ||
+    q.includes("visa")
   ) {
     return false;
   }
@@ -212,7 +278,7 @@ function isDescriptiveQuestion(qText) {
 function answerQuestion(qText, options = []) {
   const q = (qText || "").toLowerCase();
 
-  // 1. Check persistent memory
+  // 1. Check persistent memory first
   const saved = getPersistedAnswer(qText);
   if (saved) {
     if (options.length > 0) {
@@ -223,27 +289,126 @@ function answerQuestion(qText, options = []) {
     }
   }
 
+  // 2. STRICT USER DIRECTIVE: Offer in hand / received offer / holding offer -> ALWAYS "No"
+  if (
+    q.includes("offer") ||
+    q.includes("holding any offer") ||
+    q.includes("other offer") ||
+    q.includes("counter offer") ||
+    q.includes("received an offer") ||
+    q.includes("received offer") ||
+    q.includes("offer in hand")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => {
+        const ol = o.toLowerCase();
+        return ol.startsWith("no") || ol.includes("no offer") || ol.includes("none");
+      });
+      if (match) return match;
+    }
+    return "No";
+  }
+
+  // 3. STRICT USER DIRECTIVE: Company association -> ALWAYS "No"
+  if (
+    q.includes("associated with") ||
+    q.includes("previously employed") ||
+    q.includes("worked with us") ||
+    q.includes("past employee") ||
+    q.includes("previously worked") ||
+    q.includes("ex-employee") ||
+    q.includes("worked before") ||
+    q.includes("military fellow")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => {
+        const ol = o.toLowerCase();
+        return ol.startsWith("no") || ol.includes("never associated") || ol === "n/a";
+      });
+      if (match) return match;
+    }
+    return "No";
+  }
+
+  // 4. STRICT USER DIRECTIVE: Military spouse / partner -> ALWAYS "No"
+  if (
+    q.includes("military spouse") ||
+    q.includes("military partner") ||
+    q.includes("military fellow") ||
+    q.includes("military")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => {
+        const ol = o.toLowerCase();
+        return ol.includes("not a military spouse") || ol.startsWith("no") || ol.includes("never associated") || ol === "n/a";
+      });
+      if (match) return match;
+    }
+    return "No";
+  }
+
+  // 5. Restrictive covenants / non-compete -> ALWAYS "No"
+  if (
+    q.includes("restrictive covenant") ||
+    q.includes("noncompete") ||
+    q.includes("confidentiality agreement") ||
+    q.includes("restrict you performing")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => o.toLowerCase().startsWith("no"));
+      if (match) return match;
+    }
+    return "No";
+  }
+
+  // 6. STRICT USER DIRECTIVE: Visa Sponsorship for Bangalore/India -> ALWAYS "No"
+  if (
+    q.includes("sponsorship") ||
+    q.includes("visa status") ||
+    q.includes("require sponsorship") ||
+    q.includes("work authorization")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => o.toLowerCase().startsWith("no"));
+      if (match) return match;
+    }
+    return "No";
+  }
+
   // If descriptive text question and no saved answer -> prompt user!
   if (options.length === 0 && isDescriptiveQuestion(qText)) {
     return null;
   }
 
-  // 2. Experience questions (CRITICAL: match accurate bracket for 7 years)
+  // 7. Experience questions (CRITICAL: match 7-8 when 6-7 and 7-8 exist; strictly >= 7 years, never <7)
   const isExperience =
     /\bexp\b|\bexperience\b|\byears?\b|\bhow many years\b/i.test(q) ||
     (options.length > 0 && options.some((o) => o.toLowerCase().includes("year")));
 
   if (isExperience) {
     if (options.length > 0) {
-      const match = matchExperienceOption(options, 7);
+      const match = matchExperienceOption(options, 7.5);
       if (match) return match;
-      // If ambiguous, return null so user is prompted to learn
       return null;
     }
     return "7";
   }
 
-  // 3. Notice period & serving notice
+  // 8. Organization type (Product based vs Service based)
+  if (
+    q.includes("product based") ||
+    q.includes("service based") ||
+    q.includes("organization is a product") ||
+    q.includes("company type")
+  ) {
+    if (options.length > 0) {
+      const match = options.find((o) => o.toLowerCase().includes("product"));
+      if (match) return match;
+    }
+    return "Product based";
+  }
+
+  // 9. Notice period & serving notice
   if (
     q.includes("notice period") ||
     q.includes("notice") ||
@@ -253,6 +418,12 @@ function answerQuestion(qText, options = []) {
     q.includes("last working day") ||
     q.includes("serving")
   ) {
+    if (q.includes("are you currently serving") || q.includes("serving notice")) {
+      if (options.length > 0) {
+        const match = options.find((o) => o.toLowerCase().startsWith("no"));
+        if (match) return match;
+      }
+    }
     if (options.length > 0) {
       const match = options.find((o) => {
         const ol = o.toLowerCase();
@@ -269,7 +440,7 @@ function answerQuestion(qText, options = []) {
     return "30 days";
   }
 
-  // 4. Relocation / shifts / work model
+  // 10. Relocation / shifts / work model
   if (
     q.includes("relocate") ||
     q.includes("comfortable") ||
@@ -287,7 +458,7 @@ function answerQuestion(qText, options = []) {
     return "Yes";
   }
 
-  // 5. Compensation / CTC
+  // 11. Compensation / CTC
   if (
     q.includes("current ctc") ||
     q.includes("current salary") ||
@@ -307,7 +478,7 @@ function answerQuestion(qText, options = []) {
     return CANDIDATE_PROFILE.expectedCTC;
   }
 
-  // 6. Location
+  // 12. Location
   if (q.includes("current location") || q.includes("where do you live")) {
     return CANDIDATE_PROFILE.currentLocation;
   }
@@ -318,7 +489,7 @@ function answerQuestion(qText, options = []) {
     return "Bangalore";
   }
 
-  // 7. Role, Company & Reason for change
+  // 13. Role, Company & Reason for change
   if (q.includes("current company") || q.includes("current employer") || q.includes("present company")) {
     return CANDIDATE_PROFILE.currentCompany;
   }
@@ -329,7 +500,7 @@ function answerQuestion(qText, options = []) {
     return CANDIDATE_PROFILE.reasonForChange;
   }
 
-  // 8. Education
+  // 14. Education
   if (q.includes("10th")) return CANDIDATE_PROFILE.education.tenthYear;
   if (q.includes("12th")) return CANDIDATE_PROFILE.education.twelfthYear;
   if (q.includes("highest qualification") || q.includes("post graduation") || q.includes("master")) {
@@ -339,7 +510,7 @@ function answerQuestion(qText, options = []) {
     return CANDIDATE_PROFILE.education.ugDegree;
   }
 
-  // 9. Technical Skills
+  // 15. Technical Skills
   const skillKeywords = [
     "python", "machine learning", "deep learning", "nlp", "llm", "genai", "generative ai",
     "rag", "agentic", "sql", "pyspark", "fastapi", "docker", "kubernetes", "databricks", "azure", "aws"
@@ -356,20 +527,86 @@ function answerQuestion(qText, options = []) {
   if (options.length > 0) {
     const match = options.find((o) => o.toLowerCase().startsWith("yes"));
     if (match) return match;
-    return null; // Ambiguous options -> prompt user!
+    return null;
   }
 
   if (q.length > 30) {
-    return null; // Unknown descriptive question -> prompt user!
+    return null;
   }
 
   return "Yes";
 }
 
+async function checkAppliedOption(jobPage) {
+  await jobPage.evaluate(async () => {
+    const h = document.body.scrollHeight;
+    for (let step = 1; step <= 6; step++) {
+      window.scrollTo({ top: (h * step) / 6, behavior: "smooth" });
+      await new Promise((r) => setTimeout(r, 60));
+    }
+  });
+  await jobPage.waitForTimeout(800);
+
+  return await jobPage.evaluate(() => {
+    const elements = Array.from(document.querySelectorAll("button, div[role='button'], a, div.rounded-full, span.rounded-full"));
+    for (const el of elements) {
+      const text = (el.innerText || "").trim();
+      const style = window.getComputedStyle(el);
+      const bg = style.backgroundColor;
+
+      let isGreen = false;
+      const m = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (m) {
+        const r = parseInt(m[1], 10), g = parseInt(m[2], 10), bVal = parseInt(m[3], 10);
+        if (g > 120 && g > r * 1.2 && g > bVal * 1.2) {
+          isGreen = true;
+        }
+      }
+      const isGreenClass = el.className.includes("green") || el.className.includes("bg-green") || el.className.includes("emerald");
+
+      if ((isGreen || isGreenClass) && /applied/i.test(text)) {
+        return { isApplied: true, reason: "Green button with Applied text", text, bg };
+      }
+
+      if (/applied/i.test(text)) {
+        const hasCheck = el.querySelector("img[alt='Check'], svg, [class*='check'], [class*='Check']") || text.includes("✓") || text.includes("✔");
+        if (hasCheck && (isGreen || isGreenClass || style.cursor === "default" || style.pointerEvents === "none" || el.hasAttribute("disabled"))) {
+          return { isApplied: true, reason: "Applied button with Checkmark", text, bg };
+        }
+        if (/^applied\s*[✓✔]?$/i.test(text)) {
+          return { isApplied: true, reason: "Button with exact Applied text", text, bg };
+        }
+      }
+    }
+
+    const allSpans = Array.from(document.querySelectorAll("div, span, p"));
+    for (const s of allSpans) {
+      const t = (s.innerText || "").trim();
+      if (/^applied\s*[✓✔]?$/i.test(t)) {
+        const rect = s.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          const style = window.getComputedStyle(s);
+          const bg = style.backgroundColor;
+          const m = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+          if (m && parseInt(m[2], 10) > 120 && parseInt(m[2], 10) > parseInt(m[1], 10) * 1.2) {
+            return { isApplied: true, reason: "Green element with Applied text", text: t };
+          }
+          const parentBg = s.parentElement ? window.getComputedStyle(s.parentElement).backgroundColor : "";
+          const pm = parentBg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+          if (pm && parseInt(pm[2], 10) > 120 && parseInt(pm[2], 10) > parseInt(pm[1], 10) * 1.2) {
+            return { isApplied: true, reason: "Element inside green container with Applied text", text: t };
+          }
+        }
+      }
+    }
+
+    return { isApplied: false };
+  });
+}
+
 async function findAndClickQuickApply(jobPage) {
   console.log("Checking candidate paths for Quick apply button...");
 
-  // Scroll smoothly to trigger sticky/bottom action bar
   await jobPage.evaluate(async () => {
     const h = document.body.scrollHeight;
     for (let step = 1; step <= 10; step++) {
@@ -416,7 +653,6 @@ async function findAndClickQuickApply(jobPage) {
 
   await jobPage.mouse.click(matched.rect.x, matched.rect.y);
 
-  // Also dispatch DOM click
   await jobPage.evaluate((p) => {
     let el = null;
     if (p.type === "xpath" || p.path.startsWith("/") || p.path.startsWith("(")) {
@@ -434,19 +670,19 @@ async function findAndClickQuickApply(jobPage) {
   return true;
 }
 
-async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
-  console.log("Monitoring and answering chatbot screening questions (5 mins stuck watchdog)...");
+async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionStartTime = 0, globalTimeoutMs = 900000) {
+  console.log("Monitoring and answering chatbot screening questions...");
   let lastProgressTime = Date.now();
   let startTime = Date.now();
   let lastSeenQuestion = "";
-  const STUCK_TIMEOUT_MS = 300000; // 5 minutes stuck watchdog
+  const STUCK_TIMEOUT_MS = 60000;
 
   while (true) {
     if (jobPage.isClosed()) {
       console.log("Job page closed by browser after application. Considering completed.");
       return true;
     }
-    if (sessionStartTime > 0 && Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS) {
+    if (sessionStartTime > 0 && Date.now() - sessionStartTime >= globalTimeoutMs) {
       console.log("[TIMEOUT] Global session timeout reached. Stopping cleanly.");
       return false;
     }
@@ -454,21 +690,31 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
     const elapsedTotal = Date.now() - startTime;
 
     if (elapsedSinceProgress >= STUCK_TIMEOUT_MS) {
-      console.log(`[WATCHDOG TRIGGERED] Stuck without progress for ${Math.round(elapsedSinceProgress / 1000)}s (> 5 mins). Stopping cleanly.`);
+      console.log(`[WATCHDOG TRIGGERED] Stuck without progress for ${Math.round(elapsedSinceProgress / 1000)}s (> 60s). Stopping cleanly.`);
       return false;
     }
 
     let state;
     try {
-    try {
       state = await jobPage.evaluate(() => {
         const bodyText = document.body.innerText || "";
-        const isThanks =
+        
+        let isThanks =
           bodyText.includes("Thank you for your responses") ||
           bodyText.includes("Your profile has been shared") ||
           bodyText.includes("Your response has been recorded") ||
           bodyText.includes("Application sent") ||
           bodyText.includes("Applied successfully");
+
+        const buttons = Array.from(document.querySelectorAll("button, div[role='button']"));
+        for (const b of buttons) {
+          const bg = window.getComputedStyle(b).backgroundColor;
+          const m = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+          if (m && parseInt(m[2], 10) > 120 && parseInt(m[2], 10) > parseInt(m[1], 10) * 1.2 && /applied/i.test(b.innerText)) {
+            isThanks = true;
+            break;
+          }
+        }
 
         const drawer = document.querySelector(".chatbot_Drawer, #desktopChatBotContainer, ._chatBotContainer");
         if (!drawer && isThanks) {
@@ -481,14 +727,13 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
         if (saveIdx > 0) {
           for (let i = saveIdx - 1; i >= 0; i--) {
             const l = questionLines[i];
-            if (l.endsWith("?") || (l.length > 5 && !["yes", "no", "save", "skip"].includes(l.toLowerCase()))) {
+            if (l.endsWith("?") || (l.length > 5 && !["yes", "no", "save", "skip", "skip this question"].includes(l.toLowerCase()))) {
               latestQuestion = l;
               break;
             }
           }
         }
 
-        // Detect radio elements
         const radioEls = Array.from(
           document.querySelectorAll(
             ".singleselect-radiobutton label, .ssrc__radio-btn-container label, label.ssrc__label, input[type='radio'], [role='radio'], label.mcc__label"
@@ -500,7 +745,6 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
 
         const options = radioEls.map((el) => (el.innerText || el.value || "").trim()).filter(Boolean);
 
-        // Detect checkboxes (multi-select)
         const checkboxEls = Array.from(
           document.querySelectorAll(
             "input[type='checkbox'], .checkbox-wrap label, .multiselect label, .mcc__checkbox"
@@ -511,13 +755,11 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
         });
         const checkboxOptions = checkboxEls.map((el) => (el.innerText || el.value || "").trim()).filter(Boolean);
 
-        // Detect dropdown / select
         const selectEls = Array.from(document.querySelectorAll("select, .dropdownContainer, .custom-select")).filter((el) => {
           const r = el.getBoundingClientRect();
           return r.width > 0 && r.height > 0 && el.offsetParent !== null;
         });
 
-        // Detect text input
         const inputEl = document.querySelector(
           ".textArea, div.textArea[contenteditable='true'], textarea, .chatbot_Drawer input[type='text']"
         );
@@ -528,7 +770,6 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
             return r.width > 0 && r.height > 0 && inputEl.offsetParent !== null && !inputEl.classList.contains("suggestor-input");
           })();
 
-        // Save button
         const saveBtn = document.querySelector(".sendMsg, button.save, .sendMsgbtn_container .sendMsg");
         const isSaveEnabled = !!saveBtn && !document.querySelector(".sendMsgbtn_container .send.disabled");
 
@@ -551,16 +792,17 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       return false;
     }
 
-    if (!state.hasDrawer && !state.hasRadio && !state.hasVisibleTextInput && !state.hasSaveBtn && elapsedTotal > 20000) {
-      console.log("No chatbot drawer or screening questions appeared after 20s. Moving to next job.");
-      return false;
-    }
     if (state.isThanks) {
       console.log("\n=======================================================");
-      console.log("SUCCESS! Received 'Thank you for your responses.'");
-      console.log("Application completed successfully!");
+      console.log("SUCCESS! Application confirmed / 'Applied' recorded.");
       console.log("=======================================================\n");
       return true;
+    }
+
+    if (!state.hasDrawer && !state.hasRadio && !state.hasVisibleTextInput && !state.hasSaveBtn && elapsedTotal > 15000) {
+      console.log("No chatbot drawer or screening questions appeared after 15s. Checking if completed...");
+      if (state.isThanks) return true;
+      return false;
     }
 
     if (state.latestQuestion && state.latestQuestion !== lastSeenQuestion) {
@@ -569,7 +811,6 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       lastProgressTime = Date.now();
     }
 
-    // Use learned answers & knowledge store. Only prompt for unknown/ambiguous questions.
     const chosenAnswer = answerQuestion(state.latestQuestion, state.options);
     const isMultiSelect = (state.hasCheckboxes && state.checkboxOptions && state.checkboxOptions.length > 0) || state.hasSelect;
     const isDescriptive = state.hasVisibleTextInput && !chosenAnswer && isDescriptiveQuestion(state.latestQuestion);
@@ -596,7 +837,7 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
         console.log(`Checkbox Options: ${JSON.stringify(state.checkboxOptions)}`);
       }
       console.log("\n>>> PLEASE ANSWER THIS QUESTION IN CHROME AND CLICK 'SAVE' <<<");
-      console.log("Waiting up to 180s for you to fill and click Save in Chrome...");
+      console.log("Waiting up to 120s for you to fill and click Save in Chrome...");
       console.log("=======================================================\n");
 
       await jobPage.bringToFront();
@@ -605,7 +846,7 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       let capturedAnswer = "";
       let userSubmitted = false;
 
-      while (Date.now() - waitStart < 180000) {
+      while (Date.now() - waitStart < 120000) {
         await jobPage.waitForTimeout(800);
 
         const liveData = await jobPage.evaluate(() => {
@@ -671,6 +912,7 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       if (userSubmitted || capturedAnswer) {
         console.log(`\n[LEARNED FROM USER] Question: "${state.latestQuestion}"`);
         console.log(`[LEARNED FROM USER] Stored Answer: "${capturedAnswer || 'Submitted'}"`);
+        recordEncountered(jobTitle, company, state.latestQuestion, capturedAnswer || "User Submitted", "user_prompt");
         if (state.latestQuestion && capturedAnswer) {
           persistAnswer(state.latestQuestion, capturedAnswer);
         }
@@ -678,7 +920,7 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
         await jobPage.waitForTimeout(2000);
         continue;
       } else {
-        console.log("[USER INPUT TIMEOUT] No answer submitted after 180s. Moving forward.");
+        console.log("[USER INPUT TIMEOUT] No answer submitted after 120s. Moving forward.");
         return false;
       }
     }
@@ -689,8 +931,9 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       console.log(`[RADIO BUTTON QUESTION] Options: ${JSON.stringify(state.options)}`);
       console.log(`-> Selecting: "${chosenAnswer}" (strictly bypassing text box)...`);
 
-      // Persist learned answer
-      if (state.latestQuestion) {
+      recordEncountered(jobTitle, company, state.latestQuestion, chosenAnswer, "radio");
+
+      if (state.latestQuestion && chosenAnswer) {
         persistAnswer(state.latestQuestion, chosenAnswer);
       }
 
@@ -705,14 +948,13 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
         });
 
         let target = radioLabels.find((el) => (el.innerText || el.value || "").trim().toLowerCase() === ans.toLowerCase());
-        if (!target && ans.toLowerCase().startsWith("yes")) {
-          target = radioLabels.find((el) => (el.innerText || el.value || "").trim().toLowerCase().startsWith("yes"));
-        }
         if (!target && ans.toLowerCase().startsWith("no")) {
           target = radioLabels.find((el) => (el.innerText || el.value || "").trim().toLowerCase().startsWith("no"));
         }
+        if (!target && ans.toLowerCase().startsWith("yes")) {
+          target = radioLabels.find((el) => (el.innerText || el.value || "").trim().toLowerCase().startsWith("yes"));
+        }
 
-        // Never fall back to negative/entry options like "No experience"
         if (!target && radioLabels.length > 0) {
           const positiveLabels = radioLabels.filter((el) => {
             const txt = (el.innerText || el.value || "").toLowerCase();
@@ -756,7 +998,9 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       console.log(`[TEXT-BASED QUESTION] Question: "${state.latestQuestion}"`);
       console.log(`-> Typing answer: "${chosenAnswer}"...`);
 
-      if (state.latestQuestion) {
+      recordEncountered(jobTitle, company, state.latestQuestion, chosenAnswer, "text");
+
+      if (state.latestQuestion && chosenAnswer) {
         persistAnswer(state.latestQuestion, chosenAnswer);
       }
 
@@ -802,15 +1046,8 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       continue;
     }
 
-      if (!jobPage.isClosed()) {
-        await jobPage.waitForTimeout(1000);
-      }
-    } catch (err) {
-      if (err.message && (err.message.includes("closed") || err.message.includes("Target"))) {
-        console.log("Job page closed during processing. Considering completed.");
-        return true;
-      }
-      throw err;
+    if (!jobPage.isClosed()) {
+      await jobPage.waitForTimeout(1000);
     }
   }
 }
@@ -820,7 +1057,6 @@ function matchesJobPreferences(card) {
   const snip = (card.snippet || "").toLowerCase();
   const full = `${t} ${snip}`;
 
-  // Exclusion filters
   const excludeKeywords = [
     "data analyst", "business analyst", "bi analyst", "bi developer",
     "qa ", "quality assurance", "tester", "devops", "generic data engineering",
@@ -830,7 +1066,6 @@ function matchesJobPreferences(card) {
     return false;
   }
 
-  // Priority keywords
   const priorityKeywords = [
     "lead", "senior", "sr", "architect", "principal", "staff", "manager",
     "machine learning", "ml", "data scientist", "data science", "ai", "artificial intelligence",
@@ -839,48 +1074,66 @@ function matchesJobPreferences(card) {
 
   return priorityKeywords.some((pk) => full.includes(pk));
 }
+
+function isWithinLast7Days(cardSnippet) {
+  const s = (cardSnippet || "").toLowerCase();
+  const daysMatch = s.match(/(\d+)\s*d\s*ago/);
+  if (daysMatch) {
+    const days = parseInt(daysMatch[1], 10);
+    return days <= 7;
+  }
+  if (
+    s.includes("30+d ago") || s.includes("30+ d ago") ||
+    s.includes("15d ago") || s.includes("20d ago") ||
+    s.includes("8d ago") || s.includes("9d ago") || s.includes("10d ago") ||
+    s.includes("11d ago") || s.includes("12d ago") || s.includes("13d ago") || s.includes("14d ago")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 async function main() {
   const TARGET_JOBS_COUNT = parseInt(process.env.TARGET_JOBS_COUNT || "5", 10);
-  const GLOBAL_SESSION_TIMEOUT_MS = parseInt(process.env.GLOBAL_SESSION_TIMEOUT_MS || "300000", 10); // 2 minutes
+  const GLOBAL_SESSION_TIMEOUT_MS = parseInt(process.env.GLOBAL_SESSION_TIMEOUT_MS || "900000", 10); // 15 mins
   let appliedCount = 0;
 
-  console.log(`Starting Batch Application Automation (Target: ${TARGET_JOBS_COUNT} jobs, Timeout: ${GLOBAL_SESSION_TIMEOUT_MS / 1000}s)`);
+  console.log(`\n======================================================`);
+  console.log(`Starting Naukri Job Apply Automation (5 Recent Jobs - Last 7 Days)`);
+  console.log(`Target: ${TARGET_JOBS_COUNT} jobs | Hard Timeout: ${GLOBAL_SESSION_TIMEOUT_MS / 1000} seconds`);
+  console.log(`======================================================\n`);
+
   console.log("Connecting to Chrome on port 53178...");
   const browser = await chromium.connectOverCDP("http://127.0.0.1:53178", { noDefaults: true });
   const context = browser.contexts()[0];
 
   const SEARCH_FEEDS = [
-    "https://www.naukri.com/lead-data-scientist-jobs-in-bengaluru?k=lead%20data%20scientist&l=bengaluru",
-    "https://www.naukri.com/ai-engineer-jobs-in-bengaluru?k=ai%20engineer&l=bengaluru",
-    "https://www.naukri.com/ml-engineer-jobs-in-bengaluru?k=ml%20engineer&l=bengaluru",
-    "https://www.naukri.com/machine-learning-engineer-jobs-in-bengaluru?k=machine%20learning%20engineer&l=bengaluru",
-    "https://www.naukri.com/senior-data-scientist-jobs-in-bengaluru?k=senior%20data%20scientist&l=bengaluru",
-    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=high_salary",
-    "https://www.naukri.com/mnjuser/recommendedjobs?clusterId=top_candidate",
-    "https://www.naukri.com/mnjuser/recommendedjobs"
+    "https://www.naukri.com/lead-data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=lead%20data%20scientist&l=bengaluru",
+    "https://www.naukri.com/senior-data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=senior%20data%20scientist&l=bengaluru",
+    "https://www.naukri.com/ai-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=ai%20engineer&l=bengaluru",
+    "https://www.naukri.com/machine-learning-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=machine%20learning%20engineer&l=bengaluru",
+    "https://www.naukri.com/ml-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=ml%20engineer&l=bengaluru",
+    "https://www.naukri.com/generative-ai-jobs-in-bengaluru?sort=r&jobAge=7&k=generative%20ai&l=bengaluru",
+    "https://www.naukri.com/lead-machine-learning-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=lead%20machine%20learning%20engineer&l=bengaluru",
+    "https://www.naukri.com/data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=data%20scientist&l=bengaluru"
   ];
   let currentFeedIndex = 0;
 
-  let recPage = context.pages().find((p) => p.url().includes("naukri.com"));
+  let recPage = context.pages().find((p) => p.url().includes("naukri.com") && !p.url().includes("job-listings-"));
   if (!recPage) {
     console.log(`Opening search feed: ${SEARCH_FEEDS[0]}...`);
     recPage = await context.newPage();
     await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
   } else {
     await recPage.bringToFront();
-    if (!SEARCH_FEEDS.some((f) => recPage.url().includes(f.split("?")[0]))) {
-      console.log(`Navigating to search feed: ${SEARCH_FEEDS[0]}...`);
-      await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
-    }
+    console.log(`Navigating to recent search feed (last 7 days): ${SEARCH_FEEDS[0]}...`);
+    await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
   }
 
   await recPage.waitForTimeout(3000);
 
   const appliedUrls = new Set();
-  const appliedCompanies = new Set([
-    "epam", "bean hr", "tavant", "tredence", "shell", "zs associates",
-    "huntingcube", "spectraforce", "avom", "equinix", "coupa"
-  ]);
+  const appliedCompanies = new Set();
   let appliedJobsList = [];
   if (fs.existsSync(APPLIED_FILE)) {
     try {
@@ -890,6 +1143,7 @@ async function main() {
       if (Array.isArray(d.appliedJobs)) appliedJobsList = d.appliedJobs;
     } catch {}
   }
+
   function recordApplied(url, title = "", company = "") {
     const cleanUrl = url.split("?")[0];
     appliedUrls.add(cleanUrl);
@@ -907,14 +1161,11 @@ async function main() {
     };
     try {
       fs.writeFileSync(APPLIED_FILE, JSON.stringify(dataToWrite, null, 2));
-      console.log(`[STORED APPLIED JOB] Saved to ${APPLIED_FILE}: "${title}" (${company})`);
+      console.log(`[STORE APPLIED JOB] Saved to ${APPLIED_FILE}: "${title}" (${company})`);
     } catch (e) {
       console.warn("Could not write to APPLIED_FILE:", e.message);
     }
-    try {
-      const repoReport = path.join(process.cwd(), "runs_data", "naukri_applied_jobs.json");
-      fs.writeFileSync(repoReport, JSON.stringify(dataToWrite, null, 2));
-    } catch {}
+    saveEncounteredQuestions();
   }
 
   const sessionStartTime = Date.now();
@@ -922,12 +1173,12 @@ async function main() {
 
   while (appliedCount < TARGET_JOBS_COUNT) {
     if (Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS) {
-      console.log("\n[5-MIN HARD STOP] Exactly 5 minutes elapsed. Stopping all processing cleanly.");
+      console.log("\n[HARD STOP] Session timeout reached. Stopping all processing cleanly.");
       break;
     }
 
     console.log(`\n======================================================`);
-    console.log(`LOOKING FOR JOB #${appliedCount + 1} OF ${TARGET_JOBS_COUNT}...`);
+    console.log(`LOOKING FOR RECENT JOB #${appliedCount + 1} OF ${TARGET_JOBS_COUNT} (Last 7 Days)...`);
     console.log(`======================================================`);
 
     await recPage.bringToFront();
@@ -935,13 +1186,12 @@ async function main() {
 
     let candidateCard = null;
 
-    // Scan cards, scroll if needed
     for (let scrollAttempt = 0; scrollAttempt < 15; scrollAttempt++) {
       const cards = await recPage.evaluate(({ appliedList, companyList }) => {
         const s = document.getElementById("scrollableDiv");
         const cardElements = s
           ? Array.from(s.children)
-          : Array.from(document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800"));
+          : Array.from(document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800, .srp-jobtuple-wrapper"));
         if (!cardElements || cardElements.length === 0) return [];
         return cardElements.map((c, i) => {
           const txt = c.innerText || "";
@@ -949,11 +1199,13 @@ async function main() {
           const titleEl =
             c.querySelector(".text-title18Sb.text-n100") ||
             c.querySelector(".text-title18Sb") ||
+            c.querySelector(".title") ||
             c.querySelector("h2") ||
             c;
           const compEl =
             c.querySelector(".text-title18Sb.text-n200") ||
             c.querySelector(".text-title16Sb.text-n200") ||
+            c.querySelector(".comp-name") ||
             c.querySelector("h4");
           const company = compEl ? (compEl.innerText || "").split("\n")[0].trim() : "";
           const link = c.querySelector("a[href*='job-listings-']");
@@ -981,7 +1233,8 @@ async function main() {
           !c.isEarly &&
           c.title.length > 2 &&
           (!c.href || !appliedUrls.has(c.href.split("?")[0])) &&
-          matchesJobPreferences(c)
+          matchesJobPreferences(c) &&
+          isWithinLast7Days(c.snippet)
         ) {
           candidateCard = c;
           break;
@@ -990,7 +1243,7 @@ async function main() {
 
       if (candidateCard) break;
 
-      console.log("No unapplied matching job in current view. Scrolling...");
+      console.log("No unapplied matching recent job in current view. Scrolling...");
       await recPage.evaluate(() => {
         const s = document.getElementById("scrollableDiv");
         if (s) s.scrollBy(0, 700);
@@ -1003,26 +1256,26 @@ async function main() {
       currentFeedIndex++;
       if (currentFeedIndex < SEARCH_FEEDS.length) {
         processedIndices.clear();
-        console.log(`Switching to search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
+        console.log(`Switching to recent search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
         await recPage.goto(SEARCH_FEEDS[currentFeedIndex], { waitUntil: "domcontentloaded" });
         await recPage.waitForTimeout(3000);
         continue;
       } else {
-        console.log("No more matching unapplied Quick Apply jobs found across search feeds.");
+        console.log("No more matching unapplied Quick Apply jobs found across recent search feeds.");
         break;
       }
     }
 
     processedIndices.add(candidateCard.index);
-    console.log(`\nSelected Job #${appliedCount + 1}:`);
+    console.log(`\nSelected Recent Job #${appliedCount + 1}:`);
     console.log(`- Card Index: ${candidateCard.index}`);
     console.log(`- Title: ${candidateCard.title}`);
-    console.log(`- Snippet: ${candidateCard.snippet.slice(0, 120)}...`);
+    console.log(`- Company: ${candidateCard.company}`);
+    console.log(`- Snippet: ${candidateCard.snippet.slice(0, 100)}...`);
 
-    // Scroll card into view and click
     await recPage.evaluate((idx) => {
       const s = document.getElementById("scrollableDiv");
-      const card = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800")[idx];
+      const card = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800, .srp-jobtuple-wrapper")[idx];
       if (card) {
         card.scrollIntoView({ block: "center" });
       }
@@ -1033,11 +1286,12 @@ async function main() {
 
     await recPage.evaluate((idx) => {
       const s = document.getElementById("scrollableDiv");
-      const c = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800")[idx];
+      const c = s ? s.children[idx] : document.querySelectorAll("div.cursor-pointer.rounded-3xl.bg-n800, .srp-jobtuple-wrapper")[idx];
       if (c) {
         const t =
           c.querySelector(".text-title18Sb.text-n100") ||
           c.querySelector(".text-title18Sb") ||
+          c.querySelector(".title") ||
           c.querySelector("h2") ||
           c;
         t.click();
@@ -1051,30 +1305,60 @@ async function main() {
     }
 
     await jobPage.waitForLoadState("domcontentloaded");
-    await jobPage.waitForTimeout(3000);
+    await jobPage.waitForTimeout(2500);
     const jobUrl = jobPage.url();
     console.log(`Opened Job URL: ${jobUrl}`);
 
-    if (appliedUrls.has(jobUrl)) {
-      console.log("Already applied to this URL in this session. Skipping.");
+    if (appliedUrls.has(jobUrl.split("?")[0])) {
+      console.log("[ALREADY APPLIED IN STORE]: URL previously registered. Closing job tab immediately and moving ahead.");
       if (!jobPage.isClosed()) await jobPage.close();
       continue;
     }
 
-    // Check Quick Apply button and click
+    console.log("Checking if this job displays the 'Applied' option...");
+    const appliedCheck = await checkAppliedOption(jobPage);
+    if (appliedCheck.isApplied) {
+      console.log(`\n>>> [DETECTED APPLIED OPTION]: "${appliedCheck.reason}" - "${appliedCheck.text}" <<<`);
+      console.log(`As instructed, simply closing this job tab and moving ahead to the next job.\n`);
+      appliedUrls.add(jobUrl.split("?")[0]);
+      if (!jobPage.isClosed()) {
+        await jobPage.close();
+      }
+      continue;
+    }
+
+    console.log("Job is NOT marked Applied. Attempting to click 'Quick apply'...");
     const clicked = await findAndClickQuickApply(jobPage);
     if (!clicked) {
-      console.log("Quick apply button not clickable on this page. Skipping to next job.");
-      if (!jobPage.isClosed()) await jobPage.close();
+      console.log("Quick apply button was not clickable on this page. Moving to next candidate.");
       continue;
     }
 
-    await jobPage.waitForTimeout(4000);
+    console.log(`\n*****************************************************************`);
+    console.log(`[MANDATORY USER RULE ENFORCED]: Quick apply was clicked!`);
+    console.log(`It is mandatory NOT to close this job tab under any circumstance.`);
+    console.log(`*****************************************************************\n`);
 
-    // Check status
+    await jobPage.waitForTimeout(3500);
+
     const statusAfterClick = await jobPage.evaluate(() => {
       const body = document.body.innerText || "";
-      const isApplied = body.includes("Applied") && !body.includes("Save") && !body.includes("question");
+      let isApplied =
+        body.includes("Thank you for your responses") ||
+        body.includes("Your profile has been shared") ||
+        body.includes("Application sent") ||
+        body.includes("Applied successfully");
+
+      const buttons = Array.from(document.querySelectorAll("button, div[role='button']"));
+      for (const b of buttons) {
+        const bg = window.getComputedStyle(b).backgroundColor;
+        const m = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (m && parseInt(m[2], 10) > 120 && parseInt(m[2], 10) > parseInt(m[1], 10) * 1.2 && /applied/i.test(b.innerText)) {
+          isApplied = true;
+          break;
+        }
+      }
+
       const drawer = document.querySelector(".chatbot_Drawer, #desktopChatBotContainer, ._chatBotContainer");
       return { isApplied, hasDrawer: !!drawer };
     });
@@ -1084,92 +1368,30 @@ async function main() {
       console.log("Job applied directly without screening questions!");
       success = true;
     } else {
-      success = await solveChatbotDrawer(jobPage, sessionStartTime);
-      if (success === "RESTART") {
-        console.log("Restarting application for current job...");
-        const reClicked = await findAndClickQuickApply(jobPage);
-        if (reClicked) {
-          await jobPage.waitForTimeout(3000);
-          success = await solveChatbotDrawer(jobPage, sessionStartTime);
-        } else {
-          success = false;
-        }
-      }
+      success = await solveChatbotDrawer(jobPage, candidateCard.title, candidateCard.company, sessionStartTime, GLOBAL_SESSION_TIMEOUT_MS);
     }
 
     if (success) {
       appliedCount++;
       recordApplied(jobUrl, candidateCard.title, candidateCard.company);
-      console.log(`\n>>> Successfully applied to Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
-
-      if (appliedCount < TARGET_JOBS_COUNT && Date.now() - sessionStartTime < GLOBAL_SESSION_TIMEOUT_MS && jobPage && !jobPage.isClosed()) {
-        console.log("Checking for matching similar jobs on page...");
-        let similarJobs = [];
-        try {
-          similarJobs = await jobPage.evaluate((appliedList) => {
-            const links = Array.from(document.querySelectorAll("a[href*='job-listings-']"));
-            const matches = [];
-            for (const a of links) {
-              const href = a.href.split("?")[0];
-              const card = a.closest("div, article, section") || a;
-              const cardText = (card.innerText || "").toLowerCase();
-              if (
-                !appliedList.includes(href) &&
-                cardText.includes("quick apply") &&
-                !cardText.includes("applied")
-              ) {
-                matches.push({ url: a.href, text: a.innerText });
-              }
-            }
-            return matches;
-          }, Array.from(appliedUrls));
-
-          let appliedSimilar = false;
-          for (const sim of similarJobs) {
-            if (Date.now() - sessionStartTime >= GLOBAL_SESSION_TIMEOUT_MS || appliedCount >= TARGET_JOBS_COUNT) break;
-            const simClean = sim.url.split("?")[0];
-            if (appliedUrls.has(simClean)) continue;
-
-            console.log(`Opening matching similar job: ${sim.text} (${sim.url})...`);
-            await jobPage.goto(sim.url, { waitUntil: "domcontentloaded" });
-            await jobPage.waitForTimeout(3000);
-
-            const simClicked = await findAndClickQuickApply(jobPage);
-            if (simClicked) {
-              await jobPage.waitForTimeout(3000);
-              const simOk = await solveChatbotDrawer(jobPage, sessionStartTime);
-              if (simOk) {
-                appliedCount++;
-                recordApplied(sim.url);
-                console.log(`\n>>> Successfully applied to Similar Job #${appliedCount} of ${TARGET_JOBS_COUNT}! <<<\n`);
-                appliedSimilar = true;
-                break;
-              }
-            }
-          }
-          if (!appliedSimilar) {
-            console.log("No more matching similar jobs on this page. Returning to searching for jobs page...");
-          }
-        } catch (simErr) {
-          console.log("Could not inspect similar jobs (page closed or redirected). Returning to search feed...");
-        }
-      }
+      console.log(`\n======================================================`);
+      console.log(`>>> SUCCESSFULLY APPLIED TO JOB #${appliedCount} OF ${TARGET_JOBS_COUNT}! <<<`);
+      console.log(`Job: "${candidateCard.title}" at "${candidateCard.company}"`);
+      console.log(`URL: ${jobUrl}`);
+      console.log(`======================================================\n`);
     } else {
-      console.log(`Application was not confirmed for ${jobUrl}.`);
+      console.log(`Application was not confirmed for ${jobUrl}. Tab remains open as mandatory.`);
     }
 
-    // Delay 2 seconds before closing tab
-    if (!jobPage.isClosed()) {
-      await jobPage.waitForTimeout(2000);
-    }
-    // Close job tab to keep workspace clean
-    await jobPage.close().catch(() => {});
     await recPage.bringToFront();
     await recPage.waitForTimeout(1500);
   }
 
+  saveEncounteredQuestions();
+
   console.log(`\n======================================================`);
-  console.log(`BATCH APPLICATION COMPLETE! Applied to ${appliedCount} jobs.`);
+  console.log(`BATCH APPLICATION RUN FINISHED! Total Applied: ${appliedCount} / ${TARGET_JOBS_COUNT} jobs.`);
+  console.log(`Total screening questions logged: ${encounteredQuestions.length}`);
   console.log(`======================================================\n`);
   process.exit(0);
 }

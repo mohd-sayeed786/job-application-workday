@@ -289,6 +289,16 @@ Always scroll the matched element into view, verify bounding rect dimensions, an
 4. **Stuck / Watchdog Guard:**
    - Track progress timestamps. If the chatbot flow or screening questions do not advance for more than 1 minute (60 seconds), stop cleanly immediately.
 
+5. **Critical User Profile & Screening Disclosures (Strictly Enforced):**
+   - **Offers in Hand**: User has **NO offers in hand** ("No"). Any question regarding holding an offer, having an offer, or receiving an offer must answer **"No"**.
+   - **Experience Bracket Disambiguation**: When both `6-7` (or `6 to 7`) and `7-8` (or `7 to 8`) appear as radio options, **strictly select `7-8`**. User has 7+ years of experience; never select `<7` or `6-7`.
+   - **Company Association**: When asked if previously associated with, employed by, or worked with the company, **always answer "No"** (or "No - Never associated").
+   - **Military Spouse / Partner**: When asked if a military spouse or partner, **always answer "No"** (or "I am not a military spouse or partner").
+   - **Job Tab Lifecycle**:
+     - If an opened job shows the green `Applied ✓` option, **close that job tab immediately** and move to next.
+     - Once `Quick apply` is clicked, it is **strictly mandatory NOT to close** that job tab under any circumstance.
+
+
 ---
 
 ## Field Mapping Reference
