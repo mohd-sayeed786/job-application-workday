@@ -569,16 +569,21 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       lastProgressTime = Date.now();
     }
 
-    // User requested: "This time don't fill by yourself, I'll fill all the questions you just learn."
-    // Whenever any screening question input exists in the drawer, wait for user to answer in Chrome
-    const hasScreeningQuestion = state.hasRadio || state.hasVisibleTextInput || state.hasCheckboxes || state.hasSelect;
+    // Use learned answers & knowledge store. Only prompt for unknown/ambiguous questions.
+    const chosenAnswer = answerQuestion(state.latestQuestion, state.options);
+    const isMultiSelect = (state.hasCheckboxes && state.checkboxOptions && state.checkboxOptions.length > 0) || state.hasSelect;
+    const isDescriptive = state.hasVisibleTextInput && !chosenAnswer && isDescriptiveQuestion(state.latestQuestion);
+    const isAmbiguousRadio = state.hasRadio && !chosenAnswer;
+    const isUnknownText = state.hasVisibleTextInput && !chosenAnswer;
 
-    if (hasScreeningQuestion) {
-      const qType = (state.hasCheckboxes || state.hasSelect)
+    if (isMultiSelect || isDescriptive || isAmbiguousRadio || isUnknownText) {
+      const qType = isMultiSelect
         ? "Multi-Select / Dropdown Question"
-        : state.hasRadio
-        ? "Radio Button Question"
-        : "Text Question";
+        : isDescriptive
+        ? "Descriptive Question"
+        : isAmbiguousRadio
+        ? "Ambiguous Radio Question"
+        : "Unrecognized Question";
 
       console.log("\n=======================================================");
       console.log(`[USER INPUT NEEDED - REINFORCEMENT LEARNING]`);
