@@ -483,9 +483,6 @@ function answerQuestion(qText, options = []) {
     if (options.length > 0) {
       const match = options.find((o) => {
         const ol = o.toLowerCase();
-        if (CANDIDATE_PROFILE.noticePeriod?.toLowerCase().includes("immediate")) {
-          return ol.includes("immediate") || ol.includes("15") || ol.includes("0-15") || ol.includes("available");
-        }
         return (
           ol.includes("15") ||
           ol.includes("30") ||
@@ -564,13 +561,8 @@ function answerQuestion(qText, options = []) {
   if (q.includes("current role") || q.includes("current designation") || q.includes("current title")) {
     return CANDIDATE_PROFILE.currentRole;
   }
-  if (
-    q.includes("reason for change") ||
-    q.includes("why are you looking") ||
-    q.includes("reason for looking") ||
-    (q.includes("reason") && (q.includes("wfh") || q.includes("remote") || q.includes("job") || q.includes("change")))
-  ) {
-    return CANDIDATE_PROFILE.reasonForChange || "Career growth & better opportunities";
+  if (q.includes("reason for change") || q.includes("why are you looking")) {
+    return CANDIDATE_PROFILE.reasonForChange;
   }
 
   // 14. Education
@@ -1398,7 +1390,6 @@ async function main() {
     const clicked = await findAndClickQuickApply(jobPage);
     if (!clicked) {
       console.log("Quick apply button was not clickable on this page. Moving to next candidate.");
-      if (!jobPage.isClosed()) await jobPage.close();
       continue;
     }
 

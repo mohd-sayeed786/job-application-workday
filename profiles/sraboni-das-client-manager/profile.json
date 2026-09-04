@@ -22,7 +22,7 @@
   "fixedCTC": "7.25",
   "variableCTC": "0",
   "expectedCTC": "10",
-  "noticePeriod": "15 days",
+  "noticePeriod": "Immediate joiner",
   "servingNotice": "No",
   "holdingOffer": "No",
   "reasonForChange": "Career growth & better opportunities",

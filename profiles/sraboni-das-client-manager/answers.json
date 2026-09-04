@@ -39,7 +39,7 @@
     "question.notice": {
       "key": "question.notice",
       "question": "What is your notice period?",
-      "value": "15 days",
+      "value": "Immediate joiner",
       "source": "user_policy",
       "state": "confirmed"
     },
@@ -86,7 +86,7 @@
     "question.dc328088efc21058c3db7023ac3f0c6ec3570839b9dc2cb27fab0680400fa8b1": {
       "key": "question.dc328088efc21058c3db7023ac3f0c6ec3570839b9dc2cb27fab0680400fa8b1",
       "question": "What is your notice period? If Serving LWD details please",
-      "value": "15 days",
+      "value": "Immediate joiner",
       "source": "learned_automation",
       "state": "confirmed",
       "updatedAt": "2026-09-04T12:03:12.537Z"
@@ -166,7 +166,7 @@
     "question.83dcce0e1fcb518853750f650523554a074df56aadd033bdd061b5bacb641dfe": {
       "key": "question.83dcce0e1fcb518853750f650523554a074df56aadd033bdd061b5bacb641dfe",
       "question": "Reason for looking WFH ?",
-      "value": "Yes",
+      "value": "Career growth & better opportunities",
       "source": "learned_automation",
       "state": "confirmed",
       "updatedAt": "2026-09-04T12:05:28.316Z"
