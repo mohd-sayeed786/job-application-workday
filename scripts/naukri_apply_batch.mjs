@@ -116,6 +116,99 @@ function getPersistedAnswer(question) {
   return null;
 }
 
+function matchExperienceOption(options, userExp = 7) {
+  if (!options || options.length === 0) return null;
+
+  const parsed = options.map((opt) => {
+    const o = opt.trim();
+    const ol = o.toLowerCase();
+
+    if (ol === "yes") return { opt, min: 0, max: 99 };
+    if (ol === "no" || ol.includes("no experience") || ol.includes("none")) return { opt, min: -1, max: -1 };
+
+    // Range like "5-7", "5 - 7 years", "6 to 8", "5-10"
+    const rangeMatch = ol.match(/(\d+)\s*(?:-|to)\s*(\d+)/);
+    if (rangeMatch) {
+      return { opt, min: parseInt(rangeMatch[1], 10), max: parseInt(rangeMatch[2], 10) };
+    }
+
+    // "5 or more than 5", "5 or more", "7+", ">7", ">=7", "more than 5", "> 5 years"
+    const moreMatch = ol.match(/(?:>|>=|more than|at least)\s*(\d+)|(\d+)\s*(?:\+|or more)/);
+    if (moreMatch) {
+      const val = parseInt(moreMatch[1] || moreMatch[2], 10);
+      return { opt, min: val, max: 99 };
+    }
+
+    // "<8 years", "< 8", "less than 8", "under 8"
+    const lessMatch = ol.match(/(?:<|<=|less than|under)\s*(\d+)/);
+    if (lessMatch) {
+      const val = parseInt(lessMatch[1], 10);
+      return { opt, min: 0, max: val };
+    }
+
+    // Single number like "7 years", "7"
+    const singleMatch = ol.match(/(\d+)\s*(?:years?|yrs?)?/);
+    if (singleMatch) {
+      const val = parseInt(singleMatch[1], 10);
+      return { opt, min: val, max: val };
+    }
+
+    return { opt, min: -1, max: -1 };
+  });
+
+  const matching = parsed.filter((p) => p.min >= 0 && userExp >= p.min && userExp <= p.max);
+  if (matching.length === 0) return null;
+
+  matching.sort((a, b) => (a.max - a.min) - (b.max - b.min));
+  return matching[0].opt;
+}
+
+function isDescriptiveQuestion(qText) {
+  if (!qText) return false;
+  const q = qText.toLowerCase().trim();
+
+  if (
+    q.includes("how many years") ||
+    q.includes("notice period") ||
+    q.includes("np") ||
+    q.includes("ctc") ||
+    q.includes("salary") ||
+    q.includes("package") ||
+    q.includes("10th") ||
+    q.includes("12th") ||
+    q.includes("last working day") ||
+    q.includes("current company") ||
+    q.includes("current role") ||
+    q.includes("current designation") ||
+    q.includes("current location") ||
+    q.includes("preferred location") ||
+    q.includes("highest qualification")
+  ) {
+    return false;
+  }
+
+  if (
+    q.includes("relocate") ||
+    q.includes("comfortable working") ||
+    q.includes("ready to") ||
+    q.includes("available for f2f") ||
+    q.includes("available for in-person") ||
+    q.includes("hybrid") ||
+    q.includes("shift")
+  ) {
+    return false;
+  }
+
+  const descriptiveKeywords = [
+    "which domain", "what domain", "domains", "explain", "describe",
+    "highlight your", "tell us", "brief", "what kind", "what projects",
+    "core ml algorithms", "dl principles", "statistical & mathematical",
+    "use cases", "share details", "summary of", "model types", "traditional machine learning"
+  ];
+
+  return descriptiveKeywords.some((w) => q.includes(w)) || (q.length > 70 && !q.includes("how many years"));
+}
+
 function answerQuestion(qText, options = []) {
   const q = (qText || "").toLowerCase();
 
@@ -130,47 +223,22 @@ function answerQuestion(qText, options = []) {
     }
   }
 
-  // 2. Experience questions (CRITICAL: ALWAYS >= 7, 7-8, 7-9, 7+, >7, never <7 or No experience)
+  // If descriptive text question and no saved answer -> prompt user!
+  if (options.length === 0 && isDescriptiveQuestion(qText)) {
+    return null;
+  }
+
+  // 2. Experience questions (CRITICAL: match accurate bracket for 7 years)
   const isExperience =
-    q.includes("experience") ||
-    q.includes("exp") ||
-    q.includes("years") ||
-    q.includes("how many years") ||
+    /\bexp\b|\bexperience\b|\byears?\b|\bhow many years\b/i.test(q) ||
     (options.length > 0 && options.some((o) => o.toLowerCase().includes("year")));
 
   if (isExperience) {
     if (options.length > 0) {
-      // Filter out entry / negative / zero options
-      const validOptions = options.filter((o) => {
-        const ol = o.toLowerCase();
-        return !ol.includes("no experience") && !ol.includes("none") && !ol.startsWith("<");
-      });
-
-      // Prefer explicit 7+ ranges
-      let match = validOptions.find((o) =>
-        /7\s*-\s*[89]|7\s*\+|>[=]?\s*7|7\s*years/i.test(o)
-      );
-
-      // Prefer >6, >5, 8+, 9+, 10+, >12
-      if (!match) {
-        match = validOptions.find((o) =>
-          />\s*[56789]|>\\s*1[0-9]|\b[89]\s*\+|\b1[0-9]\s*\+/i.test(o)
-        );
-      }
-
-      // Prefer 5-7, 6-8, 5-6
-      if (!match) {
-        match = validOptions.find((o) =>
-          /5\s*-\s*[67]|6\s*-\s*[78]/i.test(o)
-        );
-      }
-
-      // Fallback to highest valid positive option (never No experience)
-      if (!match && validOptions.length > 0) {
-        match = validOptions[validOptions.length - 1];
-      }
-
+      const match = matchExperienceOption(options, 7);
       if (match) return match;
+      // If ambiguous, return null so user is prompted to learn
+      return null;
     }
     return "7";
   }
@@ -284,11 +352,15 @@ function answerQuestion(qText, options = []) {
     return "Yes";
   }
 
-  // Default fallback
+  // Fallback for options
   if (options.length > 0) {
     const match = options.find((o) => o.toLowerCase().startsWith("yes"));
     if (match) return match;
-    return options[0];
+    return null; // Ambiguous options -> prompt user!
+  }
+
+  if (q.length > 30) {
+    return null; // Unknown descriptive question -> prompt user!
   }
 
   return "Yes";
@@ -428,6 +500,23 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
 
         const options = radioEls.map((el) => (el.innerText || el.value || "").trim()).filter(Boolean);
 
+        // Detect checkboxes (multi-select)
+        const checkboxEls = Array.from(
+          document.querySelectorAll(
+            "input[type='checkbox'], .checkbox-wrap label, .multiselect label, .mcc__checkbox"
+          )
+        ).filter((el) => {
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0 && el.offsetParent !== null;
+        });
+        const checkboxOptions = checkboxEls.map((el) => (el.innerText || el.value || "").trim()).filter(Boolean);
+
+        // Detect dropdown / select
+        const selectEls = Array.from(document.querySelectorAll("select, .dropdownContainer, .custom-select")).filter((el) => {
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0 && el.offsetParent !== null;
+        });
+
         // Detect text input
         const inputEl = document.querySelector(
           ".textArea, div.textArea[contenteditable='true'], textarea, .chatbot_Drawer input[type='text']"
@@ -449,6 +538,9 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
           latestQuestion,
           options,
           hasRadio: radioEls.length > 0,
+          hasCheckboxes: checkboxEls.length > 0,
+          checkboxOptions,
+          hasSelect: selectEls.length > 0,
           hasVisibleTextInput,
           hasSaveBtn: !!saveBtn,
           isSaveEnabled
@@ -475,6 +567,120 @@ async function solveChatbotDrawer(jobPage, sessionStartTime = 0) {
       console.log(`\n[NEW QUESTION DETECTED]: "${state.latestQuestion}"`);
       lastSeenQuestion = state.latestQuestion;
       lastProgressTime = Date.now();
+    }
+
+    // Reinforcement Learning: Check if question requires user input
+    const isMultiSelect = (state.hasCheckboxes && state.checkboxOptions && state.checkboxOptions.length > 0) || state.hasSelect;
+    const isDescriptive = state.hasVisibleTextInput && isDescriptiveQuestion(state.latestQuestion);
+    const chosenAnswer = answerQuestion(state.latestQuestion, state.options);
+    const isAmbiguousRadio = state.hasRadio && !chosenAnswer;
+    const isUnknownText = state.hasVisibleTextInput && !chosenAnswer;
+
+    if (isMultiSelect || isDescriptive || isAmbiguousRadio || isUnknownText) {
+      const qType = isMultiSelect
+        ? "Multi-Select / Dropdown Question"
+        : isDescriptive
+        ? "Descriptive Question"
+        : isAmbiguousRadio
+        ? "Ambiguous Radio Question"
+        : "Unrecognized Question";
+
+      console.log("\n=======================================================");
+      console.log(`[USER INPUT NEEDED - REINFORCEMENT LEARNING]`);
+      console.log(`Question: "${state.latestQuestion}"`);
+      console.log(`Question Type: ${qType}`);
+      if (state.options && state.options.length > 0) {
+        console.log(`Options: ${JSON.stringify(state.options)}`);
+      }
+      if (state.checkboxOptions && state.checkboxOptions.length > 0) {
+        console.log(`Checkbox Options: ${JSON.stringify(state.checkboxOptions)}`);
+      }
+      console.log("\n>>> PLEASE ANSWER THIS QUESTION IN CHROME AND CLICK 'SAVE' <<<");
+      console.log("Waiting up to 180s for you to fill and click Save in Chrome...");
+      console.log("=======================================================\n");
+
+      await jobPage.bringToFront();
+
+      const waitStart = Date.now();
+      let capturedAnswer = "";
+      let userSubmitted = false;
+
+      while (Date.now() - waitStart < 180000) {
+        await jobPage.waitForTimeout(800);
+
+        const liveData = await jobPage.evaluate(() => {
+          const input = document.querySelector(
+            ".textArea, div.textArea[contenteditable='true'], textarea, .chatbot_Drawer input[type='text']"
+          );
+          const textVal = input ? (input.value || input.innerText || "").trim() : "";
+
+          const checkedRadios = Array.from(
+            document.querySelectorAll("input[type='radio']:checked, .singleselect-radiobutton input:checked")
+          ).map((r) => {
+            const lbl = r.closest("label") || document.querySelector(`label[for='${r.id}']`);
+            return (lbl?.innerText || r.value || "").trim();
+          }).filter(Boolean);
+
+          const checkedBoxes = Array.from(document.querySelectorAll("input[type='checkbox']:checked")).map((c) => {
+            const lbl = c.closest("label") || document.querySelector(`label[for='${c.id}']`);
+            return (lbl?.innerText || c.value || "").trim();
+          }).filter(Boolean);
+
+          const drawer = document.querySelector(".chatbot_Drawer, #desktopChatBotContainer, ._chatBotContainer");
+          const bodyText = document.body.innerText || "";
+          const isThanks =
+            bodyText.includes("Thank you for your responses") ||
+            bodyText.includes("Your profile has been shared") ||
+            bodyText.includes("Your response has been recorded") ||
+            bodyText.includes("Application sent") ||
+            bodyText.includes("Applied successfully");
+
+          return { textVal, checkedRadios, checkedBoxes, isThanks, hasDrawer: !!drawer };
+        });
+
+        if (liveData.textVal) capturedAnswer = liveData.textVal;
+        if (liveData.checkedRadios.length > 0) capturedAnswer = liveData.checkedRadios[0];
+        if (liveData.checkedBoxes.length > 0) capturedAnswer = liveData.checkedBoxes.join(", ");
+
+        if (liveData.isThanks) {
+          userSubmitted = true;
+          break;
+        }
+
+        const currentQ = await jobPage.evaluate(() => {
+          const drawer = document.querySelector(".chatbot_Drawer, #desktopChatBotContainer, ._chatBotContainer");
+          const lines = (drawer ? drawer.innerText : document.body.innerText).split("\n").map((s) => s.trim()).filter(Boolean);
+          const sIdx = lines.lastIndexOf("Save");
+          if (sIdx > 0) {
+            for (let i = sIdx - 1; i >= 0; i--) {
+              const l = lines[i];
+              if (l.endsWith("?") || (l.length > 5 && !["yes", "no", "save", "skip"].includes(l.toLowerCase()))) {
+                return l;
+              }
+            }
+          }
+          return "";
+        });
+
+        if (currentQ && currentQ !== state.latestQuestion) {
+          userSubmitted = true;
+          break;
+        }
+      }
+
+      if (userSubmitted || capturedAnswer) {
+        console.log(`\n[LEARNED FROM USER] Question: "${state.latestQuestion}"`);
+        console.log(`[LEARNED FROM USER] Stored Answer: "${capturedAnswer || 'Submitted'}"`);
+        if (state.latestQuestion && capturedAnswer) {
+          persistAnswer(state.latestQuestion, capturedAnswer);
+        }
+        lastProgressTime = Date.now();
+        await jobPage.waitForTimeout(2000);
+        continue;
+      } else {
+        console.log("[USER INPUT TIMEOUT] No answer submitted after 180s. Moving forward.");
+        return false;
+      }
     }
 
     // 1. Radio button question
