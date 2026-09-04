@@ -4,45 +4,67 @@ import os from "os";
 import path from "path";
 import crypto from "crypto";
 
-const CANDIDATE_PROFILE = {
-  name: "Mohammad Sayeed",
-  email: "sayeed.mcs17.du@gmail.com",
-  phone: "7982776638",
-  linkedIn: "https://www.linkedin.com/in/mohammad-sayeed",
-  github: "https://github.com/mohd-sayeed786",
-  experienceYears: "7+",
-  currentRole: "Senior Data Scientist",
-  currentCompany: "Tata Digital",
-  currentLocation: "Bangalore",
-  preferredLocations: ["Bangalore", "Hyderabad", "Pune"],
-  nativeLocation: "Lucknow",
-  currentCTC: "36.7",
-  fixedCTC: "33",
-  variableCTC: "3.7",
-  expectedCTC: "50",
-  noticePeriod: "30 days",
-  holdingOffer: "No",
-  reasonForChange: "Career growth",
-  education: {
-    tenthYear: "2012",
-    twelfthYear: "2014",
-    ugDegree: "BSc (H) Computer Science",
-    ugCollege: "Deen Dayal Upadhyaya College, University of Delhi",
-    ugYear: "2017",
-    ugScore: "89.01%",
-    pgDegree: "MSc Computer Science",
-    pgCollege: "Department of Computer Science, University of Delhi",
-    pgYear: "2019",
-    pgScore: "80.70%",
-    certifications: "Databricks Certified Generative AI Engineer Associate, IIT Delhi Advanced Data Science"
-  },
-  skills: [
-    "Python", "SQL", "PySpark", "Machine Learning", "Deep Learning", "NLP", "LLMs",
-    "Generative AI", "RAG", "Agentic AI", "Prompt Engineering", "Embeddings",
-    "Semantic Search", "Recommendation Systems", "Fraud Detection", "Credit Risk",
-    "FastAPI", "Docker", "Kubernetes", "Databricks", "Azure", "PostgreSQL", "MongoDB"
-  ]
-};
+const PROFILE_ID = process.env.PROFILE || "mohammad-sayeed-ml-engineer";
+console.log(`[PROFILE ACTIVE]: ${PROFILE_ID}`);
+
+function loadProfile(profileId) {
+  const profilePath = path.join(process.cwd(), "profiles", profileId, "profile.json");
+  if (fs.existsSync(profilePath)) {
+    try {
+      return JSON.parse(fs.readFileSync(profilePath, "utf-8"));
+    } catch (e) {
+      console.warn(`Could not parse profile at ${profilePath}:`, e.message);
+    }
+  }
+
+  // Fallback default
+  return {
+    id: "mohammad-sayeed-ml-engineer",
+    name: "Mohammad Sayeed",
+    email: "sayeed.mcs17.du@gmail.com",
+    phone: "7982776638",
+    linkedIn: "https://www.linkedin.com/in/mohammad-sayeed",
+    github: "https://github.com/mohd-sayeed786",
+    experienceYears: "7+",
+    experienceNumeric: 7.5,
+    currentRole: "Senior Data Scientist",
+    currentCompany: "Tata Digital",
+    companyType: "Product based",
+    currentLocation: "Bangalore",
+    preferredLocations: ["Bangalore", "Hyderabad", "Pune"],
+    nativeLocation: "Lucknow",
+    currentCTC: "36.7",
+    fixedCTC: "33",
+    variableCTC: "3.7",
+    expectedCTC: "50",
+    noticePeriod: "30 days",
+    servingNotice: "No",
+    holdingOffer: "No",
+    reasonForChange: "Career growth",
+    education: {
+      tenthYear: "2012",
+      twelfthYear: "2014",
+      ugDegree: "BSc (H) Computer Science",
+      ugCollege: "Deen Dayal Upadhyaya College, University of Delhi",
+      ugYear: "2017",
+      ugScore: "89.01%",
+      pgDegree: "MSc Computer Science",
+      pgCollege: "Department of Computer Science, University of Delhi",
+      pgYear: "2019",
+      pgScore: "80.70%"
+    },
+    skills: ["Python", "SQL", "Machine Learning", "Deep Learning", "NLP", "LLMs", "Generative AI", "Agentic AI"],
+    jobFilter: {
+      excludeKeywords: ["intern", "fresher", "trainee"],
+      priorityKeywords: ["lead", "senior", "data scientist", "ai", "machine learning"]
+    },
+    searchFeeds: [
+      "https://www.naukri.com/lead-data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=lead%20data%20scientist&l=bengaluru"
+    ]
+  };
+}
+
+const CANDIDATE_PROFILE = loadProfile(PROFILE_ID);
 
 const candidatePaths = [
   { type: "xpath", path: "/html/body/div[4]/div/div/div/div[1]/div[5]/div/div/div/button/span/span[1]/span" },
@@ -55,13 +77,23 @@ const candidatePaths = [
   { type: "css", path: "button:has(span.flex.items-center.gap-2\\.5)" },
   { type: "xpath", path: "//button[contains(., 'Quick apply') and not(contains(., 'Applied'))]" },
   { type: "xpath", path: "//button[contains(., 'Quick apply')]" },
-  { type: "css", path: "button#quick-apply-button" }
+  { type: "css", path: "button#quick-apply-button" },
+  { type: "css", path: "button#apply-button" },
+  { type: "xpath", path: "//button[@id='apply-button' and not(contains(., 'Applied'))]" },
+  { type: "xpath", path: "//button[normalize-space()='Apply' and not(contains(., 'Applied')) and not(contains(., 'company site'))]" }
 ];
 
 const STORE_DIR = path.join(os.homedir(), ".job-apply");
-const answersFilePath = path.join(STORE_DIR, "answers.json");
-const APPLIED_FILE = path.join(STORE_DIR, "applied_jobs.json");
-const ENCOUNTERED_QUESTIONS_FILE = path.join(process.cwd(), "runs_data", "last_batch_questions.json");
+const profileAnswersFile = path.join(process.cwd(), "profiles", PROFILE_ID, "answers.json");
+const answersFilePath = PROFILE_ID === "mohammad-sayeed-ml-engineer"
+  ? path.join(STORE_DIR, "answers.json")
+  : path.join(STORE_DIR, `answers_${PROFILE_ID}.json`);
+
+const APPLIED_FILE = PROFILE_ID === "mohammad-sayeed-ml-engineer"
+  ? path.join(STORE_DIR, "applied_jobs.json")
+  : path.join(STORE_DIR, `applied_jobs_${PROFILE_ID}.json`);
+
+const ENCOUNTERED_QUESTIONS_FILE = path.join(process.cwd(), "runs_data", `last_batch_questions_${PROFILE_ID}.json`);
 
 const encounteredQuestions = [];
 
@@ -72,6 +104,7 @@ function recordEncountered(jobTitle, company, question, answer, type = "auto") {
   );
   if (!existing) {
     encounteredQuestions.push({
+      profileId: PROFILE_ID,
       jobTitle,
       company,
       question: question.trim(),
@@ -93,6 +126,12 @@ function saveEncounteredQuestions() {
 }
 
 function loadAnswersStore() {
+  // Try profile directory first, then user home dir
+  if (fs.existsSync(profileAnswersFile)) {
+    try {
+      return JSON.parse(fs.readFileSync(profileAnswersFile, "utf-8"));
+    } catch (e) {}
+  }
   if (fs.existsSync(answersFilePath)) {
     try {
       return JSON.parse(fs.readFileSync(answersFilePath, "utf-8"));
@@ -100,7 +139,7 @@ function loadAnswersStore() {
       console.warn("Could not parse answers store:", e.message);
     }
   }
-  return { schemaVersion: 1, answers: {}, metadata: { updatedAt: new Date().toISOString() } };
+  return { schemaVersion: 1, answers: {}, metadata: { profileId: PROFILE_ID, updatedAt: new Date().toISOString() } };
 }
 
 function persistAnswer(question, answer) {
@@ -118,8 +157,12 @@ function persistAnswer(question, answer) {
       state: "confirmed",
       updatedAt: new Date().toISOString()
     };
+    store.metadata = store.metadata || {};
+    store.metadata.profileId = PROFILE_ID;
     store.metadata.updatedAt = new Date().toISOString();
 
+    fs.writeFileSync(profileAnswersFile, JSON.stringify(store, null, 2), "utf-8");
+    if (!fs.existsSync(STORE_DIR)) fs.mkdirSync(STORE_DIR, { recursive: true });
     fs.writeFileSync(answersFilePath, JSON.stringify(store, null, 2), "utf-8");
     console.log(`[STORE PERSISTED] Saved answer for: "${question.trim()}" -> "${answer}"`);
   } catch (e) {
@@ -154,28 +197,44 @@ function getPersistedAnswer(question) {
   return null;
 }
 
-function matchExperienceOption(options, userExp = 7.5) {
+function matchExperienceOption(options, userExp = CANDIDATE_PROFILE.experienceNumeric || 7.5) {
   if (!options || options.length === 0) return null;
 
-  // STRICT USER DIRECTIVE: If 6-7 and 7-8 are options, strictly select 7-8!
-  const sevenToEight = options.find((o) => {
-    const ol = o.toLowerCase();
-    return (
-      ol.includes("7-8") ||
-      ol.includes("7 to 8") ||
-      ol.includes("7-9") ||
-      ol.includes("7 to 9") ||
-      ol.includes("7+") ||
-      ol.includes(">=7") ||
-      ol.includes(">7")
-    );
-  });
-  const sixToSeven = options.find((o) => {
-    const ol = o.toLowerCase();
-    return ol.includes("6-7") || ol.includes("6 to 7") || ol.includes("<7");
-  });
-  if (sevenToEight && sixToSeven) {
-    return sevenToEight;
+  // STRICT USER DIRECTIVE FOR SAYEED: If 6-7 and 7-8 are options, strictly select 7-8!
+  if (userExp >= 7.0) {
+    const sevenToEight = options.find((o) => {
+      const ol = o.toLowerCase();
+      return (
+        ol.includes("7-8") ||
+        ol.includes("7 to 8") ||
+        ol.includes("7-9") ||
+        ol.includes("7 to 9") ||
+        ol.includes("7+") ||
+        ol.includes(">=7") ||
+        ol.includes(">7")
+      );
+    });
+    const sixToSeven = options.find((o) => {
+      const ol = o.toLowerCase();
+      return ol.includes("6-7") || ol.includes("6 to 7") || ol.includes("<7");
+    });
+    if (sevenToEight && sixToSeven) {
+      return sevenToEight;
+    }
+  }
+
+  // Bracket logic for Sraboni (userExp ~ 4.0)
+  if (userExp >= 3.5 && userExp <= 4.5) {
+    const threeToFive = options.find((o) => {
+      const ol = o.toLowerCase();
+      return (
+        ol.includes("3-5") || ol.includes("3 to 5") ||
+        ol.includes("4-5") || ol.includes("4 to 5") ||
+        ol.includes("3-6") || ol.includes("3 to 6") ||
+        ol.includes("4+") || ol.includes("4 years") || ol === "4"
+      );
+    });
+    if (threeToFive) return threeToFive;
   }
 
   const parsed = options.map((opt) => {
@@ -185,27 +244,23 @@ function matchExperienceOption(options, userExp = 7.5) {
     if (ol === "yes") return { opt, min: 0, max: 99 };
     if (ol === "no" || ol.includes("no experience") || ol.includes("none")) return { opt, min: -1, max: -1 };
 
-    // Range like "5-7", "5 - 7 years", "6 to 8", "5-10", "7-9", "7-8"
     const rangeMatch = ol.match(/(\d+)\s*(?:-|to)\s*(\d+)/);
     if (rangeMatch) {
       return { opt, min: parseInt(rangeMatch[1], 10), max: parseInt(rangeMatch[2], 10) };
     }
 
-    // "5 or more than 5", "5 or more", "7+", ">7", ">=7", "more than 5", "> 5 years"
     const moreMatch = ol.match(/(?:>|>=|more than|at least)\s*(\d+)|(\d+)\s*(?:\+|or more)/);
     if (moreMatch) {
       const val = parseInt(moreMatch[1] || moreMatch[2], 10);
       return { opt, min: val, max: 99 };
     }
 
-    // "<8 years", "< 8", "less than 8", "under 8"
     const lessMatch = ol.match(/(?:<|<=|less than|under)\s*(\d+)/);
     if (lessMatch) {
       const val = parseInt(lessMatch[1], 10);
       return { opt, min: 0, max: val };
     }
 
-    // Single number like "7 years", "7"
     const singleMatch = ol.match(/(\d+)\s*(?:years?|yrs?)?/);
     if (singleMatch) {
       const val = parseInt(singleMatch[1], 10);
@@ -268,8 +323,7 @@ function isDescriptiveQuestion(qText) {
   const descriptiveKeywords = [
     "which domain", "what domain", "domains", "explain", "describe",
     "highlight your", "tell us", "brief", "what kind", "what projects",
-    "core ml algorithms", "dl principles", "statistical & mathematical",
-    "use cases", "share details", "summary of", "model types", "traditional machine learning"
+    "use cases", "share details", "summary of"
   ];
 
   return descriptiveKeywords.some((w) => q.includes(w)) || (q.length > 70 && !q.includes("how many years"));
@@ -361,7 +415,7 @@ function answerQuestion(qText, options = []) {
     return "No";
   }
 
-  // 6. STRICT USER DIRECTIVE: Visa Sponsorship for Bangalore/India -> ALWAYS "No"
+  // 6. STRICT USER DIRECTIVE: Visa Sponsorship for India -> ALWAYS "No"
   if (
     q.includes("sponsorship") ||
     q.includes("visa status") ||
@@ -380,32 +434,33 @@ function answerQuestion(qText, options = []) {
     return null;
   }
 
-  // 7. Experience questions (CRITICAL: match 7-8 when 6-7 and 7-8 exist; strictly >= 7 years, never <7)
+  // 7. Experience questions
   const isExperience =
     /\bexp\b|\bexperience\b|\byears?\b|\bhow many years\b/i.test(q) ||
     (options.length > 0 && options.some((o) => o.toLowerCase().includes("year")));
 
   if (isExperience) {
     if (options.length > 0) {
-      const match = matchExperienceOption(options, 7.5);
+      const match = matchExperienceOption(options, CANDIDATE_PROFILE.experienceNumeric || 7.5);
       if (match) return match;
       return null;
     }
-    return "7";
+    return String(Math.floor(CANDIDATE_PROFILE.experienceNumeric || 7));
   }
 
-  // 8. Organization type (Product based vs Service based)
+  // 8. Organization type
   if (
     q.includes("product based") ||
     q.includes("service based") ||
     q.includes("organization is a product") ||
     q.includes("company type")
   ) {
+    const pref = CANDIDATE_PROFILE.companyType || "Product based";
     if (options.length > 0) {
-      const match = options.find((o) => o.toLowerCase().includes("product"));
+      const match = options.find((o) => o.toLowerCase().includes(pref.toLowerCase().slice(0, 7)));
       if (match) return match;
     }
-    return "Product based";
+    return pref;
   }
 
   // 9. Notice period & serving notice
@@ -424,20 +479,20 @@ function answerQuestion(qText, options = []) {
         if (match) return match;
       }
     }
+    const npDays = CANDIDATE_PROFILE.noticePeriod || "30 days";
     if (options.length > 0) {
       const match = options.find((o) => {
         const ol = o.toLowerCase();
         return (
-          ol.includes("30") ||
-          ol.includes("1 month") ||
           ol.includes("15") ||
+          ol.includes("30") ||
           ol.includes("immediate") ||
-          ol.includes("serving")
+          ol.includes("1 month")
         );
       });
       if (match) return match;
     }
-    return "30 days";
+    return npDays;
   }
 
   // 10. Relocation / shifts / work model
@@ -479,14 +534,24 @@ function answerQuestion(qText, options = []) {
   }
 
   // 12. Location
-  if (q.includes("current location") || q.includes("where do you live")) {
+  if (q.includes("current location") || q.includes("where do you live") || q.includes("city")) {
+    if (options.length > 0) {
+      const match = options.find((o) => {
+        const ol = o.toLowerCase();
+        return (
+          ol.includes(CANDIDATE_PROFILE.currentLocation.toLowerCase()) ||
+          (CANDIDATE_PROFILE.preferredLocations || []).some((pl) => ol.includes(pl.toLowerCase()))
+        );
+      });
+      if (match) return match;
+    }
     return CANDIDATE_PROFILE.currentLocation;
   }
   if (q.includes("native") || q.includes("hometown")) {
-    return CANDIDATE_PROFILE.nativeLocation;
+    return CANDIDATE_PROFILE.nativeLocation || CANDIDATE_PROFILE.currentLocation;
   }
   if (q.includes("preferred location")) {
-    return "Bangalore";
+    return CANDIDATE_PROFILE.preferredLocations ? CANDIDATE_PROFILE.preferredLocations[0] : "Bengaluru";
   }
 
   // 13. Role, Company & Reason for change
@@ -504,20 +569,17 @@ function answerQuestion(qText, options = []) {
   if (q.includes("10th")) return CANDIDATE_PROFILE.education.tenthYear;
   if (q.includes("12th")) return CANDIDATE_PROFILE.education.twelfthYear;
   if (q.includes("highest qualification") || q.includes("post graduation") || q.includes("master")) {
-    return CANDIDATE_PROFILE.education.pgDegree;
+    return CANDIDATE_PROFILE.education.pgDegree || CANDIDATE_PROFILE.education.ugDegree;
   }
   if (q.includes("graduation") || q.includes("undergraduate") || q.includes("degree") || q.includes("bachelor")) {
     return CANDIDATE_PROFILE.education.ugDegree;
   }
 
-  // 15. Technical Skills
-  const skillKeywords = [
-    "python", "machine learning", "deep learning", "nlp", "llm", "genai", "generative ai",
-    "rag", "agentic", "sql", "pyspark", "fastapi", "docker", "kubernetes", "databricks", "azure", "aws"
-  ];
-  if (skillKeywords.some((s) => q.includes(s))) {
+  // 15. Technical / HR Skills
+  const candidateSkills = CANDIDATE_PROFILE.skills || [];
+  if (candidateSkills.some((s) => q.includes(s.toLowerCase()))) {
     if (options.length > 0) {
-      const match = options.find((o) => o.toLowerCase().startsWith("yes") || /7|8|9|5-7|high/i.test(o));
+      const match = options.find((o) => o.toLowerCase().startsWith("yes") || /4|5|6|7|high/i.test(o));
       if (match) return match;
     }
     return "Yes";
@@ -670,7 +732,7 @@ async function findAndClickQuickApply(jobPage) {
   return true;
 }
 
-async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionStartTime = 0, globalTimeoutMs = 900000) {
+async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionStartTime = 0, globalTimeoutMs = 600000) {
   console.log("Monitoring and answering chatbot screening questions...");
   let lastProgressTime = Date.now();
   let startTime = Date.now();
@@ -727,7 +789,10 @@ async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionS
         if (saveIdx > 0) {
           for (let i = saveIdx - 1; i >= 0; i--) {
             const l = questionLines[i];
-            if (l.endsWith("?") || (l.length > 5 && !["yes", "no", "save", "skip", "skip this question"].includes(l.toLowerCase()))) {
+            if (
+              l.endsWith("?") ||
+              (l.length > 5 && !["yes", "no", "save", "skip", "skip this question"].includes(l.toLowerCase()))
+            ) {
               latestQuestion = l;
               break;
             }
@@ -862,7 +927,7 @@ async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionS
             return (lbl?.innerText || r.value || "").trim();
           }).filter(Boolean);
 
-          const checkedBoxes = Array.from(document.querySelectorAll("input[type='checkbox']:checked")).map((c) => {
+          const checkedBoxes = Array.from(document.querySelectorAll("input[type='checkbox']:checked, label.mcc__label:has(input:checked)")).map((c) => {
             const lbl = c.closest("label") || document.querySelector(`label[for='${c.id}']`);
             return (lbl?.innerText || c.value || "").trim();
           }).filter(Boolean);
@@ -895,7 +960,10 @@ async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionS
           if (sIdx > 0) {
             for (let i = sIdx - 1; i >= 0; i--) {
               const l = lines[i];
-              if (l.endsWith("?") || (l.length > 5 && !["yes", "no", "save", "skip"].includes(l.toLowerCase()))) {
+              if (
+                l.endsWith("?") ||
+                (l.length > 5 && !["yes", "no", "save", "skip", "skip this question"].includes(l.toLowerCase()))
+              ) {
                 return l;
               }
             }
@@ -925,7 +993,7 @@ async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionS
       }
     }
 
-    // 1. Radio button question
+    // 1. Radio / Label single select
     if (state.hasRadio && state.options.length > 0) {
       const chosenAnswer = answerQuestion(state.latestQuestion, state.options);
       console.log(`[RADIO BUTTON QUESTION] Options: ${JSON.stringify(state.options)}`);
@@ -940,7 +1008,7 @@ async function solveChatbotDrawer(jobPage, jobTitle = "", company = "", sessionS
       const selectResult = await jobPage.evaluate((ans) => {
         const radioLabels = Array.from(
           document.querySelectorAll(
-            ".singleselect-radiobutton label, .ssrc__radio-btn-container label, label.ssrc__label, input[type='radio']"
+            ".singleselect-radiobutton label, .ssrc__radio-btn-container label, label.ssrc__label, input[type='radio'], label.mcc__label"
           )
         ).filter((el) => {
           const r = el.getBoundingClientRect();
@@ -1057,22 +1125,20 @@ function matchesJobPreferences(card) {
   const snip = (card.snippet || "").toLowerCase();
   const full = `${t} ${snip}`;
 
-  const excludeKeywords = [
-    "data analyst", "business analyst", "bi analyst", "bi developer",
-    "qa ", "quality assurance", "tester", "devops", "generic data engineering",
-    "junior", "associate data scientist", "intern", "trainee", "fresher"
+  const filter = CANDIDATE_PROFILE.jobFilter || {};
+  const excludeKeywords = filter.excludeKeywords || [
+    "intern", "trainee", "fresher"
   ];
-  if (excludeKeywords.some((ex) => full.includes(ex))) {
+  if (excludeKeywords.some((ex) => full.includes(ex.toLowerCase()))) {
     return false;
   }
 
-  const priorityKeywords = [
-    "lead", "senior", "sr", "architect", "principal", "staff", "manager",
-    "machine learning", "ml", "data scientist", "data science", "ai", "artificial intelligence",
-    "genai", "generative ai", "llm", "rag", "agentic", "nlp"
-  ];
+  const priorityKeywords = filter.priorityKeywords || [];
+  if (priorityKeywords.length > 0) {
+    return priorityKeywords.some((pk) => full.includes(pk.toLowerCase()));
+  }
 
-  return priorityKeywords.some((pk) => full.includes(pk));
+  return true;
 }
 
 function isWithinLast7Days(cardSnippet) {
@@ -1094,29 +1160,21 @@ function isWithinLast7Days(cardSnippet) {
 }
 
 async function main() {
-  const TARGET_JOBS_COUNT = parseInt(process.env.TARGET_JOBS_COUNT || "5", 10);
-  const GLOBAL_SESSION_TIMEOUT_MS = parseInt(process.env.GLOBAL_SESSION_TIMEOUT_MS || "900000", 10); // 15 mins
+  const TARGET_JOBS_COUNT = parseInt(process.env.TARGET_JOBS_COUNT || "1", 10);
+  const GLOBAL_SESSION_TIMEOUT_MS = parseInt(process.env.GLOBAL_SESSION_TIMEOUT_MS || "600000", 10); // 10 mins
   let appliedCount = 0;
 
   console.log(`\n======================================================`);
-  console.log(`Starting Naukri Job Apply Automation (5 Recent Jobs - Last 7 Days)`);
-  console.log(`Target: ${TARGET_JOBS_COUNT} jobs | Hard Timeout: ${GLOBAL_SESSION_TIMEOUT_MS / 1000} seconds`);
+  console.log(`Starting Naukri Job Apply Automation`);
+  console.log(`Profile: ${CANDIDATE_PROFILE.name} (${PROFILE_ID})`);
+  console.log(`Target: ${TARGET_JOBS_COUNT} job(s) | Hard Timeout: ${GLOBAL_SESSION_TIMEOUT_MS / 1000} seconds`);
   console.log(`======================================================\n`);
 
   console.log("Connecting to Chrome on port 53178...");
   const browser = await chromium.connectOverCDP("http://127.0.0.1:53178", { noDefaults: true });
   const context = browser.contexts()[0];
 
-  const SEARCH_FEEDS = [
-    "https://www.naukri.com/lead-data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=lead%20data%20scientist&l=bengaluru",
-    "https://www.naukri.com/senior-data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=senior%20data%20scientist&l=bengaluru",
-    "https://www.naukri.com/ai-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=ai%20engineer&l=bengaluru",
-    "https://www.naukri.com/machine-learning-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=machine%20learning%20engineer&l=bengaluru",
-    "https://www.naukri.com/ml-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=ml%20engineer&l=bengaluru",
-    "https://www.naukri.com/generative-ai-jobs-in-bengaluru?sort=r&jobAge=7&k=generative%20ai&l=bengaluru",
-    "https://www.naukri.com/lead-machine-learning-engineer-jobs-in-bengaluru?sort=r&jobAge=7&k=lead%20machine%20learning%20engineer&l=bengaluru",
-    "https://www.naukri.com/data-scientist-jobs-in-bengaluru?sort=r&jobAge=7&k=data%20scientist&l=bengaluru"
-  ];
+  const SEARCH_FEEDS = CANDIDATE_PROFILE.searchFeeds || [];
   let currentFeedIndex = 0;
 
   let recPage = context.pages().find((p) => p.url().includes("naukri.com") && !p.url().includes("job-listings-"));
@@ -1126,7 +1184,7 @@ async function main() {
     await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
   } else {
     await recPage.bringToFront();
-    console.log(`Navigating to recent search feed (last 7 days): ${SEARCH_FEEDS[0]}...`);
+    console.log(`Navigating to profile search feed: ${SEARCH_FEEDS[0]}...`);
     await recPage.goto(SEARCH_FEEDS[0], { waitUntil: "domcontentloaded" });
   }
 
@@ -1155,6 +1213,7 @@ async function main() {
       appliedAt: new Date().toISOString()
     });
     const dataToWrite = {
+      profileId: PROFILE_ID,
       appliedUrls: Array.from(appliedUrls),
       appliedCompanies: Array.from(appliedCompanies),
       appliedJobs: appliedJobsList
@@ -1218,7 +1277,7 @@ async function main() {
             company,
             href,
             snippet: txt.replace(/\n/g, " ").slice(0, 300),
-            hasQuickApply: txt.includes("Quick apply"),
+            hasQuickApply: txt.includes("Quick apply") || (!s && !txt.includes("Apply on company site")),
             isApplied: isAlreadyApplied,
             isEarly: txt.includes("Signal early interest")
           };
@@ -1256,12 +1315,12 @@ async function main() {
       currentFeedIndex++;
       if (currentFeedIndex < SEARCH_FEEDS.length) {
         processedIndices.clear();
-        console.log(`Switching to recent search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
+        console.log(`Switching to profile search feed #${currentFeedIndex + 1}: ${SEARCH_FEEDS[currentFeedIndex]}...`);
         await recPage.goto(SEARCH_FEEDS[currentFeedIndex], { waitUntil: "domcontentloaded" });
         await recPage.waitForTimeout(3000);
         continue;
       } else {
-        console.log("No more matching unapplied Quick Apply jobs found across recent search feeds.");
+        console.log("No more matching unapplied Quick Apply jobs found across profile search feeds.");
         break;
       }
     }
@@ -1391,6 +1450,7 @@ async function main() {
 
   console.log(`\n======================================================`);
   console.log(`BATCH APPLICATION RUN FINISHED! Total Applied: ${appliedCount} / ${TARGET_JOBS_COUNT} jobs.`);
+  console.log(`Profile: ${CANDIDATE_PROFILE.name}`);
   console.log(`Total screening questions logged: ${encounteredQuestions.length}`);
   console.log(`======================================================\n`);
   process.exit(0);

@@ -301,6 +301,15 @@ Always scroll the matched element into view, verify bounding rect dimensions, an
 
 ---
 
+
+6. **Multi-Profile Architecture & Dynamic Profile Selection:**
+   - Profiles reside in `profiles/<profile-id>/` containing `profile.json` and `answers.json`.
+   - **Supported Profiles**:
+     - `mohammad-sayeed-ml-engineer`: Machine Learning Engineer / Senior Data Scientist (7+ yrs exp, 36.7 LPA CTC, Product-based preference, Lucknow/Bangalore).
+     - `sraboni-das-client-manager`: Client Manager / HR Business Partner / HR Generalist / Talent Acquisition (4+ yrs exp, 7.25 LPA CTC, 15 days notice, Kolkata/Bengaluru).
+   - Scripts dynamically resolve profile via `PROFILE=<profile-id>` (e.g. `PROFILE=sraboni-das-client-manager node scripts/naukri_apply_batch.mjs`).
+   - Profile-specific answers and applied job histories are segregated to ensure isolated application tracking.
+
 ## Field Mapping Reference
 
 | Profile Field | Common Form Labels |

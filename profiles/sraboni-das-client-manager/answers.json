@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "answers": {
+    "question.sponsorship": {
+      "key": "question.sponsorship",
+      "question": "Will you now or in the future require sponsorship for employment (e.g. H-1B visa status)?",
+      "value": "No",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.offers": {
+      "key": "question.offers",
+      "question": "Do you have any offer in hand?",
+      "value": "No",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.military": {
+      "key": "question.military",
+      "question": "Are you a military spouse or partner?",
+      "value": "No",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.associated": {
+      "key": "question.associated",
+      "question": "Have you previously been associated with this company?",
+      "value": "No",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.relocate": {
+      "key": "question.relocate",
+      "question": "Are you willing to relocate?",
+      "value": "Yes",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.notice": {
+      "key": "question.notice",
+      "question": "What is your notice period?",
+      "value": "15 days",
+      "source": "user_policy",
+      "state": "confirmed"
+    },
+    "question.9fd0481f1d8db6adbd9f03090b609326a5e909d21eac3f201f0cbfcc9d6c3f87": {
+      "key": "question.9fd0481f1d8db6adbd9f03090b609326a5e909d21eac3f201f0cbfcc9d6c3f87",
+      "question": "How many years of experience do you have in Bfsi Recruitment?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:59:53.238Z"
+    },
+    "question.df6ec89f7d82426faa58bdfbe88226f6e1f2cbf85bbdf14ff88d3e7aa7621fd8": {
+      "key": "question.df6ec89f7d82426faa58bdfbe88226f6e1f2cbf85bbdf14ff88d3e7aa7621fd8",
+      "question": "How many years of experience do you have in Volume Hiring?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:59:55.662Z"
+    },
+    "question.ce37aa607d9381e55093210daa5eed1872f517c11717aa73d40e20350ef84da3": {
+      "key": "question.ce37aa607d9381e55093210daa5eed1872f517c11717aa73d40e20350ef84da3",
+      "question": "Are you currently residing in Mumbai or willing to relocate to Mumbai?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:59:58.087Z"
+    }
+  },
+  "metadata": {
+    "profileId": "sraboni-das-client-manager",
+    "updatedAt": "2026-09-04T11:59:58.087Z"
+  }
+}

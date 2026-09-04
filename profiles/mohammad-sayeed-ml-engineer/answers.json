@@ -1,0 +1,1360 @@
+{
+  "answers": {
+    "question.1743ed1bf70b67551f18903dfd6031c8c6ef4710b760540be3161faa4705d941": {
+      "aliases": [
+        "concurrent users",
+        "highest number of concurrent users",
+        "peak concurrent users",
+        "concurrency",
+        "what is the highest number of concurrent users your system has supported?"
+      ],
+      "confirmedAt": "2026-08-27T05:45:56.835Z",
+      "key": "question.1743ed1bf70b67551f18903dfd6031c8c6ef4710b760540be3161faa4705d941",
+      "question": "What is the highest number of concurrent users your system has supported?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:45:56.835Z",
+      "value": "100000"
+    },
+    "question.23e8c5fbfd6060b470b645872437c5b499b1e9f372e9c8ce417c9169b8b6fd75": {
+      "aliases": [
+        "how do you use ai in your day-to-day work",
+        "ai in day-to-day work",
+        "favorite ai tools",
+        "benefits and pain points of ai",
+        "how do you use ai in your day-to-day work? what are some of the underappreciated benefits and/or pain points of your favorite ai tools?"
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.778Z",
+      "key": "question.23e8c5fbfd6060b470b645872437c5b499b1e9f372e9c8ce417c9169b8b6fd75",
+      "question": "How do you use AI in your day-to-day work? What are some of the underappreciated benefits and/or pain points of your favorite AI tools?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.778Z",
+      "value": "I use AI daily for prompt engineering, document intelligence, and rapid prototyping; pain points include latency and API rate limits."
+    },
+    "question.34812d4fa8794e7fd64891920d7aba06fa329014dad80d1eda378e3b24a4943a": {
+      "aliases": [
+        "in office 5 days a week",
+        "in-person collaboration",
+        "office 5 days a week",
+        "relocation to san francisco",
+        "sf bay area in office",
+        "postman we value in person collaboration. we are in office 5 days a week for all roles based out of our hubs in san francisco bay area (cupertino or san francisco)."
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.581Z",
+      "key": "question.34812d4fa8794e7fd64891920d7aba06fa329014dad80d1eda378e3b24a4943a",
+      "question": "Postman we value in person collaboration. We are in office 5 days a week for all roles based out of our hubs in San Francisco Bay Area (Cupertino or San Francisco).",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.581Z",
+      "value": "Yes"
+    },
+    "question.445f191dac8c19cdfcf03d62423009c750bee08d033226d66e789e2f46d48bae": {
+      "aliases": [
+        "require immigration support or visa sponsorship",
+        "visa sponsorship",
+        "require sponsorship",
+        "sponsorship",
+        "if hired, do you now or in the future require immigration support or visa sponsorship to continue working in the united states?"
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.680Z",
+      "key": "question.445f191dac8c19cdfcf03d62423009c750bee08d033226d66e789e2f46d48bae",
+      "question": "If hired, do you now or in the future require immigration support or visa sponsorship to continue working in the United States?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.680Z",
+      "value": "No"
+    },
+    "question.484c0122b7763ea5ad7e303c82bbcc55d83d350cebe80adfcd9fab712d0f1e0a": {
+      "aliases": [
+        "leadership experience",
+        "lead team",
+        "leading team",
+        "experience in leading team"
+      ],
+      "confirmedAt": "2026-08-27T04:33:42Z",
+      "key": "question.484c0122b7763ea5ad7e303c82bbcc55d83d350cebe80adfcd9fab712d0f1e0a",
+      "question": "Do you have experience in leading Team?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T04:33:42Z",
+      "value": "Yes"
+    },
+    "question.6a2b37ec736767b9a37c5db37d0dd1a39cc0cfb38eea28395c0231314ff4112e": {
+      "aliases": [
+        "profile headline",
+        "title headline",
+        "linkedin headline"
+      ],
+      "confirmedAt": "2026-08-27T04:33:45Z",
+      "key": "question.6a2b37ec736767b9a37c5db37d0dd1a39cc0cfb38eea28395c0231314ff4112e",
+      "question": "Headline",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T04:33:45Z",
+      "value": "Lead Data Scientist & Machine Learning Engineer"
+    },
+    "question.76d7c411513bb87019ad72a4ca6f865bf8c7eb63c8c0ec4ef69c72f8b4ba6124": {
+      "aliases": [
+        "low-resource environments",
+        "low bandwidth",
+        "multilingual",
+        "edge",
+        "offline",
+        "edge/offline",
+        "have you built systems for low-resource environments (low bandwidth, multilingual, edge/offline)?"
+      ],
+      "confirmedAt": "2026-08-27T05:47:23.809Z",
+      "key": "question.76d7c411513bb87019ad72a4ca6f865bf8c7eb63c8c0ec4ef69c72f8b4ba6124",
+      "question": "Have you built systems for low-resource environments (low bandwidth, multilingual, edge/offline)?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:47:23.809Z",
+      "value": "Yes"
+    },
+    "question.780e0681caca44624866d68ed8548d401fb688f47f9695919b643082ed21b7e3": {
+      "aliases": [
+        "exercise submission",
+        "shared url",
+        "portfolio url",
+        "project link",
+        "coding submission",
+        "exercise submission (shared url)"
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.829Z",
+      "key": "question.780e0681caca44624866d68ed8548d401fb688f47f9695919b643082ed21b7e3",
+      "question": "Exercise Submission (Shared URL)",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.829Z",
+      "value": "https://github.com/mohd-sayeed786"
+    },
+    "question.7b6b0534eeadb783c4eaff6eb4e6083733f8327ab64974b47ae7f777f77204d3": {
+      "aliases": [
+        "agent orchestration frameworks",
+        "langgraph",
+        "llamaindex",
+        "n8n",
+        "orchestration framework count",
+        "how many agent orchestration frameworks have you used hands-on (e.g., langgraph, llamaindex, n8n)?"
+      ],
+      "confirmedAt": "2026-08-27T05:45:09.750Z",
+      "key": "question.7b6b0534eeadb783c4eaff6eb4e6083733f8327ab64974b47ae7f777f77204d3",
+      "question": "How many agent orchestration frameworks have you used hands-on (e.g., LangGraph, LlamaIndex, n8n)?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:45:09.750Z",
+      "value": "3"
+    },
+    "question.7e9ce9d7ee5ae4ac4a004977b98d7510631cbc9f54de8b108d9e07e7a233a976": {
+      "aliases": [
+        "agentic ai system",
+        "end-to-end agentic ai",
+        "agentic ai in production",
+        "deployed agentic ai",
+        "have you deployed at least one end-to-end agentic ai system in production (with real users)?"
+      ],
+      "confirmedAt": "2026-08-27T05:47:54.411Z",
+      "key": "question.7e9ce9d7ee5ae4ac4a004977b98d7510631cbc9f54de8b108d9e07e7a233a976",
+      "question": "Have you deployed at least one end-to-end agentic AI system in production (with real users)?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:47:54.411Z",
+      "value": "Yes"
+    },
+    "question.83981fd3f204898444516a030fbd5325fe21c1bb31ded597e582bfab97eb46d1": {
+      "aliases": [
+        "ai product development",
+        "years of ai product development",
+        "ai product development experience"
+      ],
+      "confirmedAt": "2026-08-27T04:41:00Z",
+      "key": "question.83981fd3f204898444516a030fbd5325fe21c1bb31ded597e582bfab97eb46d1",
+      "question": "How many years of AI product development experience do you currently have?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T04:41:00Z",
+      "value": "4"
+    },
+    "question.8d7988d17bdf81ddaa7d54eb3c20c8b16d8b5170f87598691662add1c121c10e": {
+      "aliases": [
+        "if serving when is you lwd?"
+      ],
+      "confirmedAt": "2026-08-29T14:04:20.287Z",
+      "key": "question.8d7988d17bdf81ddaa7d54eb3c20c8b16d8b5170f87598691662add1c121c10e",
+      "question": "If Serving when is you LWD?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-29T14:04:20.287Z",
+      "value": "Not serving notice period"
+    },
+    "question.afde1cf9a981c17c484c4729ac1f28d5d55f1f95832e133406bf8f66d591310e": {
+      "aliases": [
+        "total years of professional experience",
+        "years of professional experience",
+        "please select your total years of professional experience:"
+      ],
+      "confirmedAt": "2026-08-27T12:31:24.457Z",
+      "key": "question.afde1cf9a981c17c484c4729ac1f28d5d55f1f95832e133406bf8f66d591310e",
+      "question": "Please select your total years of professional experience:",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T12:31:24.457Z",
+      "value": "7 years"
+    },
+    "question.b0ac73e09305796cb3430e9fd7bdeca084b55c2aa66e3951f3a720e2e056648c": {
+      "aliases": [
+        "ctc (in lakhs)",
+        "ctc in lakhs",
+        "pls mention your ctc (in lakhs)"
+      ],
+      "confirmedAt": "2026-08-27T12:34:34.885Z",
+      "key": "question.b0ac73e09305796cb3430e9fd7bdeca084b55c2aa66e3951f3a720e2e056648c",
+      "question": "Pls mention your CTC (in lakhs)",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T12:34:34.885Z",
+      "value": "37"
+    },
+    "question.b77289eb1cf977caa59bc67f1c778aec59d3eabbd4ae7b032fc06c53c7ce741b": {
+      "aliases": [
+        "years of experience in agentic ai",
+        "agentic ai experience",
+        "agentic ai"
+      ],
+      "confirmedAt": "2026-08-27T04:33:39Z",
+      "key": "question.b77289eb1cf977caa59bc67f1c778aec59d3eabbd4ae7b032fc06c53c7ce741b",
+      "question": "How many years of experience you have in Agentic AI?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T04:33:39Z",
+      "value": "4"
+    },
+    "question.b95c30e85b520e3122ad0010fffc5e8e841513bed1b81a881d39ec8eeea73a8e": {
+      "aliases": [
+        "qualification"
+      ],
+      "confirmedAt": "2026-08-29T14:47:51Z",
+      "key": "question.b95c30e85b520e3122ad0010fffc5e8e841513bed1b81a881d39ec8eeea73a8e",
+      "question": "Qualification",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-29T14:47:51Z",
+      "value": "MSc Computer Science"
+    },
+    "question.c1f4708d76a667c9a108d35c8691ae662d02afa1eb1a8333ae6ff04e1718e95f": {
+      "aliases": [
+        "interesting aspects of perplexity",
+        "why perplexity",
+        "excited to work on",
+        "what are the most interesting aspects of perplexity that you are excited to work on?"
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.729Z",
+      "key": "question.c1f4708d76a667c9a108d35c8691ae662d02afa1eb1a8333ae6ff04e1718e95f",
+      "question": "What are the most interesting aspects of Perplexity that you are excited to work on?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.729Z",
+      "value": "Building autonomous search agents, multi-modal reasoning engines, and optimizing LLM latency and hallucination-free evaluation pipelines."
+    },
+    "question.c93f536d14f4629446ec607198d9a2253c5071a0f5abce362fcb2302b23ae94e": {
+      "aliases": [
+        "fine-tune llm",
+        "lora",
+        "peft",
+        "instruction tuning",
+        "fine-tuning",
+        "adapted llms",
+        "have you fine-tuned or adapted llms (lora, peft, instruction tuning) for domain-specific tasks?"
+      ],
+      "confirmedAt": "2026-08-27T05:46:55.756Z",
+      "key": "question.c93f536d14f4629446ec607198d9a2253c5071a0f5abce362fcb2302b23ae94e",
+      "question": "Have you fine-tuned or adapted LLMs (LoRA, PEFT, instruction tuning) for domain-specific tasks?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:46:55.756Z",
+      "value": "Yes"
+    },
+    "question.cd5649ec1a6368840741d7471e0d9baf61d46aba3872d87180dcae121bee0702": {
+      "aliases": [
+        "total additional months of experience",
+        "additional months of experience",
+        "months of experience",
+        "please select your total additional months of experience:"
+      ],
+      "confirmedAt": "2026-08-27T12:31:32.355Z",
+      "key": "question.cd5649ec1a6368840741d7471e0d9baf61d46aba3872d87180dcae121bee0702",
+      "question": "Please select your total additional months of experience:",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T12:31:32.355Z",
+      "value": "3 months"
+    },
+    "question.d2af263236f639195eb25d635230e9442e7d220991f6a57dfe451dad2b9842ac": {
+      "aliases": [
+        "profile summary",
+        "professional summary",
+        "about you",
+        "bio"
+      ],
+      "confirmedAt": "2026-08-27T04:33:49Z",
+      "key": "question.d2af263236f639195eb25d635230e9442e7d220991f6a57dfe451dad2b9842ac",
+      "question": "Summary",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T04:33:49Z",
+      "value": "Senior Data Scientist with 7+ years of experience specializing in Machine Learning, Deep Learning, NLP, LLMs, and Agentic AI systems to drive business impact."
+    },
+    "question.d8d05396178d44771ec095a11950930ddf151c3fd41c8272db5ae6e98a2e2ee8": {
+      "aliases": [
+        "production python code",
+        "production python",
+        "regular python",
+        "python on ongoing basis",
+        "do you write production python code on a regular, ongoing basis (not just for occasional scripting)?"
+      ],
+      "confirmedAt": "2026-08-27T05:46:27.545Z",
+      "key": "question.d8d05396178d44771ec095a11950930ddf151c3fd41c8272db5ae6e98a2e2ee8",
+      "question": "Do you write production Python code on a regular, ongoing basis (not just for occasional scripting)?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T05:46:27.545Z",
+      "value": "Yes"
+    },
+    "question.ffcc3c18658fdb710e4a3e50c3839109d961ba3584f57dfb618e96bf0c5de5b4": {
+      "aliases": [
+        "eligible to legally work in the united states",
+        "authorized to work in us",
+        "us work authorization",
+        "legally work in us",
+        "are you currently eligible to legally work in the united states?"
+      ],
+      "confirmedAt": "2026-08-27T13:09:46.632Z",
+      "key": "question.ffcc3c18658fdb710e4a3e50c3839109d961ba3584f57dfb618e96bf0c5de5b4",
+      "question": "Are you currently eligible to legally work in the United States?",
+      "scope": {},
+      "sensitivity": "none",
+      "source": "user",
+      "state": "confirmed",
+      "updatedAt": "2026-08-27T13:09:46.632Z",
+      "value": "Yes"
+    },
+    "question.aee0b83c9b64a844ae7d2cea014b1303a6bbc886c36bc6ab14a45ef86632ce2f": {
+      "key": "question.aee0b83c9b64a844ae7d2cea014b1303a6bbc886c36bc6ab14a45ef86632ce2f",
+      "question": "Are you currently living in or ready to relocate to Bengaluru ?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:43:19.459Z"
+    },
+    "question.bf1ce53293f3a4478c72e3b38a7c096c873a6e9f7ddc4c6838a4d058b8608e9c": {
+      "key": "question.bf1ce53293f3a4478c72e3b38a7c096c873a6e9f7ddc4c6838a4d058b8608e9c",
+      "question": "Are you currently residing in Bangalore or willing to relocate to Bangalore?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:08:54.257Z"
+    },
+    "question.69c62e057abdc69d203cbce21262baabd62fb9f8be51afe61eae6445df1a3b36": {
+      "key": "question.69c62e057abdc69d203cbce21262baabd62fb9f8be51afe61eae6445df1a3b36",
+      "question": "Are you currently living in or ready to relocate to Hyderabad/Secunderabad ?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:12:59.295Z"
+    },
+    "question.ab6c2f37ed39f9209e0ec42e725691e798a6d06d4828124ee1fbb6b98126376c": {
+      "key": "question.ab6c2f37ed39f9209e0ec42e725691e798a6d06d4828124ee1fbb6b98126376c",
+      "question": "What is your notice period? If currently serving notice, kindly mention your last working day (LWD).",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:28:09.306Z"
+    },
+    "question.84eb67ded4593eb33bfd9a0598ef0d9a9f9aa82e4e41cb5dd96ceacb54299bd8": {
+      "key": "question.84eb67ded4593eb33bfd9a0598ef0d9a9f9aa82e4e41cb5dd96ceacb54299bd8",
+      "question": "How many years of experience do you have in AI (Artificial Intelligence)?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:28:11.727Z"
+    },
+    "question.94c73f736abcae5d9172165d0a4d05f70df2bc41697d5efc1446046f57f0e39e": {
+      "key": "question.94c73f736abcae5d9172165d0a4d05f70df2bc41697d5efc1446046f57f0e39e",
+      "question": "How many years of experience do you have in Machine Learning ir any AI tools?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:29:00.220Z"
+    },
+    "question.b12eb6acccfaf095e7e47de23fd2bc2b3197a22851bfa717795ebd1a76804acd": {
+      "key": "question.b12eb6acccfaf095e7e47de23fd2bc2b3197a22851bfa717795ebd1a76804acd",
+      "question": "How many years of experience do you have in Databricks ?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:29:02.638Z"
+    },
+    "question.1232dcc4016665f64388e998770d35b2b4dbc23ef4fcb59b79c0911570d47922": {
+      "key": "question.1232dcc4016665f64388e998770d35b2b4dbc23ef4fcb59b79c0911570d47922",
+      "question": "Are you currently working with a product-based company?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:29:05.059Z"
+    },
+    "question.e68f08775079eb0d348d169146deb36b0323a7e8021bd55005df9409b3353ff8": {
+      "key": "question.e68f08775079eb0d348d169146deb36b0323a7e8021bd55005df9409b3353ff8",
+      "question": "Are you currently residing in Hyderabad, Telangana or willing to relocate to Hyderabad, Telangana?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:29:20.473Z"
+    },
+    "question.87b5f2973eb4f60dec7bcf8980586db1eb419b92bfe2e84c84ff32811543115e": {
+      "key": "question.87b5f2973eb4f60dec7bcf8980586db1eb419b92bfe2e84c84ff32811543115e",
+      "question": "Willing to come in-person on 22nd Aug 2026?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-02T19:29:23.093Z"
+    },
+    "question.c34d710a289176a86bfd32ad926081b86faa547eac9c038aa9a727de72fab20b": {
+      "key": "question.c34d710a289176a86bfd32ad926081b86faa547eac9c038aa9a727de72fab20b",
+      "question": "Skip this question",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:38:29.295Z"
+    },
+    "question.162f61051d1a4329ea528aeab9d0aef97e6e98774892a04e9e09a6e12983d449": {
+      "key": "question.162f61051d1a4329ea528aeab9d0aef97e6e98774892a04e9e09a6e12983d449",
+      "question": "Total yrs of Experience?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:22:52.666Z"
+    },
+    "question.c13d13de044e2c40a704d42be40010652153d7fda63ae58d533ba109090dad1a": {
+      "key": "question.c13d13de044e2c40a704d42be40010652153d7fda63ae58d533ba109090dad1a",
+      "question": "current company name ?",
+      "value": "Tata Digital",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:22:55.093Z"
+    },
+    "question.87174be4562969f1fd8c184d29c9ac1f77e0dca939ab74fbb106d212436c78b1": {
+      "key": "question.87174be4562969f1fd8c184d29c9ac1f77e0dca939ab74fbb106d212436c78b1",
+      "question": "As this is an individual contributor role, are you comfortable working as an individual contributor?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:34:40.480Z"
+    },
+    "question.3878c918f0dc1116e20cba6d6fd07873844846eb070f8d80253ae083e96cd870": {
+      "key": "question.3878c918f0dc1116e20cba6d6fd07873844846eb070f8d80253ae083e96cd870",
+      "question": "Are you available for F2F discussion on 5th Aug at Bangalore location?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:34:58.060Z"
+    },
+    "question.c33a18b3f3806223b150b522b9ab5a162fb16b244fa1150424b3d7e913582489": {
+      "key": "question.c33a18b3f3806223b150b522b9ab5a162fb16b244fa1150424b3d7e913582489",
+      "question": "How many years of experience do you have in Commercial Analytics?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:35:15.669Z"
+    },
+    "question.b33564f61930d32d76a93eafea3ca3ea07ed9a94a362a6953c4d3e64766fae4d": {
+      "key": "question.b33564f61930d32d76a93eafea3ca3ea07ed9a94a362a6953c4d3e64766fae4d",
+      "question": "How many years of experience do you have in Market Mix Modelling?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:35:18.089Z"
+    },
+    "question.521cd2163ad2f5e059daa84827acc314e3671225c4a4e11fcdbd36222408872c": {
+      "key": "question.521cd2163ad2f5e059daa84827acc314e3671225c4a4e11fcdbd36222408872c",
+      "question": "How many years of experience do you have in Azure AI Foundry?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:37:03.701Z"
+    },
+    "question.5fab90acc183becea2f3d2e9fdc82dbf253c462b0544e475f6c35d348f410592": {
+      "key": "question.5fab90acc183becea2f3d2e9fdc82dbf253c462b0544e475f6c35d348f410592",
+      "question": "How many years of experience do you have in Amazon SageMaker?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:37:06.120Z"
+    },
+    "question.fd663867d338831dc74b73dff8983459e42bbe63ccb693e993f422ec25912922": {
+      "key": "question.fd663867d338831dc74b73dff8983459e42bbe63ccb693e993f422ec25912922",
+      "question": "How many years of experience do you have in AI Agents?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:37:08.539Z"
+    },
+    "question.bb31f10a0365798a1f240411f1c996e6b4391e6fe5db75fb5f043af5b96ee3ef": {
+      "key": "question.bb31f10a0365798a1f240411f1c996e6b4391e6fe5db75fb5f043af5b96ee3ef",
+      "question": "Are you ready to relocate to Hyderabad / Bangalore",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:37:10.957Z"
+    },
+    "question.1b975c6854bec4c23fcc041ece05f6b8cfb41941a7c966ea4795fa7dce322eeb": {
+      "key": "question.1b975c6854bec4c23fcc041ece05f6b8cfb41941a7c966ea4795fa7dce322eeb",
+      "question": "Are You interested working with Infosys",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:39:05.927Z"
+    },
+    "question.3ad6c70c7fa2799f3df6b866d18823744ae2d257ec4423557c8c0f6e484a6634": {
+      "key": "question.3ad6c70c7fa2799f3df6b866d18823744ae2d257ec4423557c8c0f6e484a6634",
+      "question": "If Your profile is previously processed OR Scheduled not valid (Please not apply)",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:39:08.346Z"
+    },
+    "question.aef25eef5d8401adfd746ac2e69f38462783e90fcb477cc8424f0e3e0904c16f": {
+      "key": "question.aef25eef5d8401adfd746ac2e69f38462783e90fcb477cc8424f0e3e0904c16f",
+      "question": "What is your notice period? Please mention your LWD",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:39:10.763Z"
+    },
+    "question.93404d9ff4288d323061c05a0bc13de845ffeb4ba424cd9289c4747c292247b5": {
+      "key": "question.93404d9ff4288d323061c05a0bc13de845ffeb4ba424cd9289c4747c292247b5",
+      "question": "Willing to work from any infosys location (Hybrid mode)",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-03T04:39:13.180Z"
+    },
+    "question.351694c3bde9607711a9887cb8013746cff8521180c46156a0039edceec6a600": {
+      "key": "question.351694c3bde9607711a9887cb8013746cff8521180c46156a0039edceec6a600",
+      "question": "Are you willing to relocate?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:35:40.093Z"
+    },
+    "question.e32bb14e3bbfc6379ba1d9e46f60955658a696280eeb7749cd48d35562d2be80": {
+      "key": "question.e32bb14e3bbfc6379ba1d9e46f60955658a696280eeb7749cd48d35562d2be80",
+      "question": "Do you do stakeholder/client management",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:02:00.501Z"
+    },
+    "question.be730cda0c45d15bac4b1d2598c617d77d60e5858bfe640b2f4937d54df756d1": {
+      "key": "question.be730cda0c45d15bac4b1d2598c617d77d60e5858bfe640b2f4937d54df756d1",
+      "question": "How many years of experience do you have in Deployment?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:03:28.541Z"
+    },
+    "question.3804a6f9b77a2de8d4aec1b4536f940e1ab63f868d444972a3002367808697dc": {
+      "key": "question.3804a6f9b77a2de8d4aec1b4536f940e1ab63f868d444972a3002367808697dc",
+      "question": "Are you available for F2F interview at Bangalore office ?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:04:58.486Z"
+    },
+    "question.33cf9b9f9b3d18e1e9852930019bd131e9eb62acd4295b1fad313db6b5233873": {
+      "key": "question.33cf9b9f9b3d18e1e9852930019bd131e9eb62acd4295b1fad313db6b5233873",
+      "question": "Data Scientist",
+      "value": "Data Science",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:05:14.174Z"
+    },
+    "question.4f33ffeb2d4a0e0038a02f20ecf1dfec97dc6745b64a6018d4bae4827bb5c13f": {
+      "key": "question.4f33ffeb2d4a0e0038a02f20ecf1dfec97dc6745b64a6018d4bae4827bb5c13f",
+      "question": "I am just trained in AI/ML, can be considered for beginner level role. Will share updated profile",
+      "value": "Yes Agree. I fit in to this experience bracket and Ready for BV, and I am B tech holder",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:05:16.790Z"
+    },
+    "question.a288f04a2fe44f9da47fa2681d91c3d777bb4cbe5657e5e66c4215348c5fbe66": {
+      "key": "question.a288f04a2fe44f9da47fa2681d91c3d777bb4cbe5657e5e66c4215348c5fbe66",
+      "question": "How many years of experience do you have in Data Architecture?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:07:27.208Z"
+    },
+    "question.1c2473c6cb0c37409c479ea298f34f4b4a85dadadcd3ca9ea3cb1f40df7fa5f8": {
+      "key": "question.1c2473c6cb0c37409c479ea298f34f4b4a85dadadcd3ca9ea3cb1f40df7fa5f8",
+      "question": "Are you comfortable working in a Run and Maintenance Operations role?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:07:44.742Z"
+    },
+    "question.10bb9cfde27c80ef858f2f985a6eea2f2fc7a794e2d31846011b2cab24e57774": {
+      "key": "question.10bb9cfde27c80ef858f2f985a6eea2f2fc7a794e2d31846011b2cab24e57774",
+      "question": "How many years of experience do you have as Data/Machine Learning Scientist ?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:07.379Z"
+    },
+    "question.79c83d2a64c61fb9d0b16e3c1822c3bc6268298cbf42b2126475c145f907429c": {
+      "key": "question.79c83d2a64c61fb9d0b16e3c1822c3bc6268298cbf42b2126475c145f907429c",
+      "question": "You need to work with lancesoft india with Visa Client",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:24.769Z"
+    },
+    "question.b4674b2fa6db0295981e1af29c061f94b1cb43fb5257ba169199aa51360d37a0": {
+      "key": "question.b4674b2fa6db0295981e1af29c061f94b1cb43fb5257ba169199aa51360d37a0",
+      "question": "Excat Last working day",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:27.189Z"
+    },
+    "question.33306c8b343ebf1232e225d6f0551897be20ee40afd2bbe39b2c05755aecc7c8": {
+      "key": "question.33306c8b343ebf1232e225d6f0551897be20ee40afd2bbe39b2c05755aecc7c8",
+      "question": "How many years of experience do you have in Hadoop?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:29.607Z"
+    },
+    "question.27e6e54c2d5a0b2d304b0e710c1d7728481cde27151689b2d1946dad11cdd2a1": {
+      "key": "question.27e6e54c2d5a0b2d304b0e710c1d7728481cde27151689b2d1946dad11cdd2a1",
+      "question": "How many years of experience do you have in Big Data?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:32.025Z"
+    },
+    "question.8e6ff8d28add08b012b1c8ded6c2da8e5b0241d1ed283ce70962231bf02e1b09": {
+      "key": "question.8e6ff8d28add08b012b1c8ded6c2da8e5b0241d1ed283ce70962231bf02e1b09",
+      "question": "How many years of experience do you have in Operations Research (Senior/Lead role)?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:49.377Z"
+    },
+    "question.a40a78fabaf9e255bd8881aadcd8d4d18a961e47eaf00c6281a7dd677c4a926e": {
+      "key": "question.a40a78fabaf9e255bd8881aadcd8d4d18a961e47eaf00c6281a7dd677c4a926e",
+      "question": "How many years of experience do you have in CPLEX?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:51.799Z"
+    },
+    "question.1ddb9db59b9e551cac1bbb96e7799b8d757ab0981a304f26c33f7375c7febe0e": {
+      "key": "question.1ddb9db59b9e551cac1bbb96e7799b8d757ab0981a304f26c33f7375c7febe0e",
+      "question": "How many years of experience do you have in Gurobi?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:08:54.224Z"
+    },
+    "question.fac6edee2921ae98396e32645a24910fb915c04a5db11d95cd39bf2e44d6887c": {
+      "key": "question.fac6edee2921ae98396e32645a24910fb915c04a5db11d95cd39bf2e44d6887c",
+      "question": "How many years of experience do you have in vector databases?",
+      "value": "5 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:36:14.600Z"
+    },
+    "question.3c977b0d61b72f7a3ed37c4fe91d49394a0c97de4a472cf3131c8a4ec2e652ad": {
+      "key": "question.3c977b0d61b72f7a3ed37c4fe91d49394a0c97de4a472cf3131c8a4ec2e652ad",
+      "question": "Which Vector databases have you worked on?",
+      "value": "Azure",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:36:28.694Z"
+    },
+    "question.ea39a213eebbd44b0ee992ad9e17d36390fec0083116fb6f19cb895de59b5aff": {
+      "key": "question.ea39a213eebbd44b0ee992ad9e17d36390fec0083116fb6f19cb895de59b5aff",
+      "question": "Azure AI search,",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:36:30.698Z"
+    },
+    "question.09f54870e776abdf423b7309e1a9da9c046aa01d5a4275618401373ee57bdd50": {
+      "key": "question.09f54870e776abdf423b7309e1a9da9c046aa01d5a4275618401373ee57bdd50",
+      "question": "Current Designation? ( L1/L2/L3)",
+      "value": "L2",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:52:30.417Z"
+    },
+    "question.6b9948496e6a39a60b8cefbdc1820731b45439eb019341e2c3c3f31bf6a48de6": {
+      "key": "question.6b9948496e6a39a60b8cefbdc1820731b45439eb019341e2c3c3f31bf6a48de6",
+      "question": "Are you currently serving notice? If yes, what is your last working date (LWD) in your current organization?",
+      "value": "No, 30",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:42:24.562Z"
+    },
+    "question.a0d41e3277e8db6107d395f402cd67797abe861ed199eac1678876cfb80af544": {
+      "key": "question.a0d41e3277e8db6107d395f402cd67797abe861ed199eac1678876cfb80af544",
+      "question": "If you are currently serving notice, when is your last working day?",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:42:43.925Z"
+    },
+    "question.f72990245c973308ed176515fd6324d5212cb91375f33628c7ef0373896870a7": {
+      "key": "question.f72990245c973308ed176515fd6324d5212cb91375f33628c7ef0373896870a7",
+      "question": ">13 years",
+      "value": "<8 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:43:51.882Z"
+    },
+    "question.6751cc217d2f67d378b5f8240ff536559d8d607b83a74620e10bf813c8b9e5ae": {
+      "key": "question.6751cc217d2f67d378b5f8240ff536559d8d607b83a74620e10bf813c8b9e5ae",
+      "question": "How many years of experience do you have in Workflow Automation?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:45:36.315Z"
+    },
+    "question.9c1879ff4cd1d1d52d21b14071acb504db4a9c0f57a22a7961e5f1597f5fe88c": {
+      "key": "question.9c1879ff4cd1d1d52d21b14071acb504db4a9c0f57a22a7961e5f1597f5fe88c",
+      "question": "Are you available for an in-person interview a JP Nagar Office, Bangalore (weekdays)?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:45:38.321Z"
+    },
+    "question.a662934b960ea8b9c1e365e66f1de1ab5fb9e16be1c19672f6f308385aa51988": {
+      "key": "question.a662934b960ea8b9c1e365e66f1de1ab5fb9e16be1c19672f6f308385aa51988",
+      "question": "What is your total years of exp?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:46:14.945Z"
+    },
+    "question.afc085f17ef0790966fad3928916f09f9c002e09e3cd7953d47fa4a35a4f1eb5": {
+      "key": "question.afc085f17ef0790966fad3928916f09f9c002e09e3cd7953d47fa4a35a4f1eb5",
+      "question": "Experience as a lead or manager?",
+      "value": "5",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:46:18.564Z"
+    },
+    "question.a57e9150a496c3d9bf73a74e2f2d99b4e666612cbfda013f9219f643ae861215": {
+      "key": "question.a57e9150a496c3d9bf73a74e2f2d99b4e666612cbfda013f9219f643ae861215",
+      "question": "Experience in AWS especially Sage maker, Lambda,S3, EKS, Athena, Bed rock?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:46:23.792Z"
+    },
+    "question.d050f679202a62ede2735540f23f280b4c20e8bb801f11f165bbe49f5f3af748": {
+      "key": "question.d050f679202a62ede2735540f23f280b4c20e8bb801f11f165bbe49f5f3af748",
+      "question": "Are you interested to work in Hybrid Model ( 3 days a week in Office)?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:47:27.886Z"
+    },
+    "question.d2cc41dfd00e84bb2159891898d8b7ad6280f6f4fa3e8dfa4605f770e455687d": {
+      "key": "question.d2cc41dfd00e84bb2159891898d8b7ad6280f6f4fa3e8dfa4605f770e455687d",
+      "question": "What is your notice period? If you are serving Notice period, please specify your LWD?",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:47:30.304Z"
+    },
+    "question.83eacd9ec419100342042931c8b28fe83943f158b664d0f36c3780351950c62e": {
+      "key": "question.83eacd9ec419100342042931c8b28fe83943f158b664d0f36c3780351950c62e",
+      "question": "Education Background - (Bachelors/Master s in Data Science, Statistics, Computer Science)",
+      "value": "Master",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:52:35.647Z"
+    },
+    "question.1b09a6dc943a6a8a987b3826fc2c6c6b293185578b74328e01e363cfafc419e8": {
+      "key": "question.1b09a6dc943a6a8a987b3826fc2c6c6b293185578b74328e01e363cfafc419e8",
+      "question": "Master's in Comp",
+      "value": "Master's in Computer",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:52:38.461Z"
+    },
+    "question.9dd1d203e9297a853865918bf44f4e2ce644bb04f71a60fd9cf4212f89085d16": {
+      "key": "question.9dd1d203e9297a853865918bf44f4e2ce644bb04f71a60fd9cf4212f89085d16",
+      "question": "Are you currently residing in Bengaluru or willing to relocate to Bengaluru?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:58:48.950Z"
+    },
+    "question.186387f21c8e636d458f04eda57ce8ab75dde0dcacac2cc3624a4d3ea83695be": {
+      "key": "question.186387f21c8e636d458f04eda57ce8ab75dde0dcacac2cc3624a4d3ea83695be",
+      "question": "How many years of experience do you have in FastAPI?",
+      "value": "7 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:53:58.972Z"
+    },
+    "question.e54fa419303f83be857903f29b8ef8af6a5383494bb4f9e09bbc5c86b5bc9d8c": {
+      "key": "question.e54fa419303f83be857903f29b8ef8af6a5383494bb4f9e09bbc5c86b5bc9d8c",
+      "question": "How many years of experience do you have in Azure ML?",
+      "value": "7 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:54:05.006Z"
+    },
+    "question.03c016f7b2436c3f27217bfaf0476418fb9e8fbb29cca49a73e8201a420952e5": {
+      "key": "question.03c016f7b2436c3f27217bfaf0476418fb9e8fbb29cca49a73e8201a420952e5",
+      "question": "This is for permanent position with T*ta group (India's Largest IT company). Are you ok?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:54:32.046Z"
+    },
+    "question.9d1d32fb602e475d8529c3ca4f9039c351ba42ca980ec12a172160997e72060a": {
+      "key": "question.9d1d32fb602e475d8529c3ca4f9039c351ba42ca980ec12a172160997e72060a",
+      "question": "I am not interested in this job - if they ask bank statement",
+      "value": "Yes, I can give bank statement for last 5 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:54:38.885Z"
+    },
+    "question.21a6616bf87e93948709ba96fc7d51624d60d92e788464a5cd83ba6827a9020f": {
+      "key": "question.21a6616bf87e93948709ba96fc7d51624d60d92e788464a5cd83ba6827a9020f",
+      "question": "None of the above and not much gap",
+      "value": "None of the above and not much gap",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:54:55.398Z"
+    },
+    "question.26794cefe998ff4bd6d17e51e9c7f15e25d2d1877eedd35effad1da0faf2178d": {
+      "key": "question.26794cefe998ff4bd6d17e51e9c7f15e25d2d1877eedd35effad1da0faf2178d",
+      "question": "PAN number is mandatory to process. Please give PAN number",
+      "value": "FMTPM4719Q",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:03.851Z"
+    },
+    "question.eddc3b7b9b97ca74f7eab107b82af2662c85a5079b1f59ccb356a2fda0a8f9f9": {
+      "key": "question.eddc3b7b9b97ca74f7eab107b82af2662c85a5079b1f59ccb356a2fda0a8f9f9",
+      "question": "Do you have offer? If yes, please give Offer Amount and Last Working Day in current company",
+      "value": "No",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:12.704Z"
+    },
+    "question.f2e178c0eb79f9041bf347dee846f756f58508df9a406d248330ad4c609b31e7": {
+      "key": "question.f2e178c0eb79f9041bf347dee846f756f58508df9a406d248330ad4c609b31e7",
+      "question": "Please mention your Top 3 Skills",
+      "value": "Python, Machine Learning, Agentic AI",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:20.360Z"
+    },
+    "question.e6a08b5c07a4a3cda87bbeb52c8c3cb935af22bdbd8459c29db663ba21f4dd96": {
+      "key": "question.e6a08b5c07a4a3cda87bbeb52c8c3cb935af22bdbd8459c29db663ba21f4dd96",
+      "question": "Python, Machine Learning, Agentic AI",
+      "value": "Python, Machine Learning, Agentic AI",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:30.412Z"
+    },
+    "question.6fdcc7f284064e2a4bf9ba2b93a358442ccf8ef97cbab137ad47fdccd528044c": {
+      "key": "question.6fdcc7f284064e2a4bf9ba2b93a358442ccf8ef97cbab137ad47fdccd528044c",
+      "question": "What is your Preferred Location?",
+      "value": "Bangalore",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:33.227Z"
+    },
+    "question.2534c444f8ca4063531d77d544f3c79217614104c4de9f2777c6418f21eb5488": {
+      "key": "question.2534c444f8ca4063531d77d544f3c79217614104c4de9f2777c6418f21eb5488",
+      "question": "What is your notice period? Mention LWD if already serving",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:53.431Z"
+    },
+    "question.07bcb45edc9e09780aaf552efb5c7e7da0fd14b4a390921935405779b8dc43bb": {
+      "key": "question.07bcb45edc9e09780aaf552efb5c7e7da0fd14b4a390921935405779b8dc43bb",
+      "question": "Pune, Maharashtra",
+      "value": "Bengaluru, Karnataka",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:55:57.862Z"
+    },
+    "question.33a8802f97a7a16c8b7b9127aa190a9f41b5420176d4f2880514c6fb8c05c901": {
+      "key": "question.33a8802f97a7a16c8b7b9127aa190a9f41b5420176d4f2880514c6fb8c05c901",
+      "question": "How many years of experience do you have in Python(we are looking for min 5years of exp)?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T10:58:46.529Z"
+    },
+    "question.4b1b896ab69de2376b189d1220b5ba7824a44be896ba6b1b134073be7f72dbc1": {
+      "key": "question.4b1b896ab69de2376b189d1220b5ba7824a44be896ba6b1b134073be7f72dbc1",
+      "question": "How many years do you have hands on with Databricks",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:00:16.827Z"
+    },
+    "question.b44daa5204662085c0edceb553ff7a4f74c649521c72fb4c655f5e37ccac0f35": {
+      "key": "question.b44daa5204662085c0edceb553ff7a4f74c649521c72fb4c655f5e37ccac0f35",
+      "question": ">9 years",
+      "value": "7-8 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:18:56.409Z"
+    },
+    "question.87c6beeef2fc28bfca4844eefa30fdbb8664541421d70a61beb4b12f497335e2": {
+      "key": "question.87c6beeef2fc28bfca4844eefa30fdbb8664541421d70a61beb4b12f497335e2",
+      "question": "How many years of experience do you have in Vector Database?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:22:55.817Z"
+    },
+    "question.2f481c961ef8d6d1dd18b5fbaae73d86a4267e95cb2b1ec15b24a3259fcd51cb": {
+      "key": "question.2f481c961ef8d6d1dd18b5fbaae73d86a4267e95cb2b1ec15b24a3259fcd51cb",
+      "question": ">16 years",
+      "value": "<10 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:23:24.905Z"
+    },
+    "question.04f790b543d838620ed577977ee09ceed01dac5cee88b8f3f8206e59a5156c5c": {
+      "key": "question.04f790b543d838620ed577977ee09ceed01dac5cee88b8f3f8206e59a5156c5c",
+      "question": "How many years of experience do you have in Azure Cloud?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:24:08.949Z"
+    },
+    "question.fa2a9c6f3f59c6fbebd3751f0a01546040bfc76f0cceb88654ec3f653a3e37b1": {
+      "key": "question.fa2a9c6f3f59c6fbebd3751f0a01546040bfc76f0cceb88654ec3f653a3e37b1",
+      "question": ">8 years",
+      "value": "7-8 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:24:30.578Z"
+    },
+    "question.90a434860d762073c4ba9b9c9ffb6edab70261602504f15c51bfc207d341d664": {
+      "key": "question.90a434860d762073c4ba9b9c9ffb6edab70261602504f15c51bfc207d341d664",
+      "question": ">5 years",
+      "value": ">5 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:24:51.565Z"
+    },
+    "question.01101d740a54b9766e95101ef7808443a6c8d47b1e5e42a7f1dbe30ff63c556e": {
+      "key": "question.01101d740a54b9766e95101ef7808443a6c8d47b1e5e42a7f1dbe30ff63c556e",
+      "question": "How many years of experience do you have in Python + Pyspark",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:23.086Z"
+    },
+    "question.951c191575da4ef11e87bb6ec6abd62439d42a974c59993ee3887a9ad074e0e3": {
+      "key": "question.951c191575da4ef11e87bb6ec6abd62439d42a974c59993ee3887a9ad074e0e3",
+      "question": "How many years of experience do you have in GCP?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:25.503Z"
+    },
+    "question.c343f7f1412193df2046deb04638922ba24e51248d09d9d80b9f1086d9bf2fa9": {
+      "key": "question.c343f7f1412193df2046deb04638922ba24e51248d09d9d80b9f1086d9bf2fa9",
+      "question": "How many years of experience do you have in Data Bricks?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:27.921Z"
+    },
+    "question.9174af5b6ed961d271b7a8298421d58f8c4e4bb502ae95db93dcaf535e796013": {
+      "key": "question.9174af5b6ed961d271b7a8298421d58f8c4e4bb502ae95db93dcaf535e796013",
+      "question": "How many years of experience do you have in Airflow ?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:30.341Z"
+    },
+    "question.af5c94094b8e89fda3ee02b49958a782d699b1e824223c36a979e6969ea0da3d": {
+      "key": "question.af5c94094b8e89fda3ee02b49958a782d699b1e824223c36a979e6969ea0da3d",
+      "question": "What is your notice period? If you are serving what is your last working day ?",
+      "value": "30 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:32.759Z"
+    },
+    "question.e9d44b615abd8ec69973177e1618c7c0667be2c6e8d3bf33cb29cf51f3d06ef7": {
+      "key": "question.e9d44b615abd8ec69973177e1618c7c0667be2c6e8d3bf33cb29cf51f3d06ef7",
+      "question": "How many years of experience do you have in Snowflake? (relevant should min 5+ years of experience in snowflake is considerable)",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:48.313Z"
+    },
+    "question.0b5d73bb79046c9c0b217aead9414b58351563852f80fd56c88273bac4737bcd": {
+      "key": "question.0b5d73bb79046c9c0b217aead9414b58351563852f80fd56c88273bac4737bcd",
+      "question": "How many years of experience do you have in Apache airflow/ MWAA",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:50.735Z"
+    },
+    "question.7c798bc5454ab20625c7b231b6284df9b15e22c483a1ccea8ea899551eced04e": {
+      "key": "question.7c798bc5454ab20625c7b231b6284df9b15e22c483a1ccea8ea899551eced04e",
+      "question": "How many years of experience do you have in GIT?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:25:53.154Z"
+    },
+    "question.8930033c1e528e8bf97051358aabf724e957af348058731077d3de19714ea08e": {
+      "key": "question.8930033c1e528e8bf97051358aabf724e957af348058731077d3de19714ea08e",
+      "question": "How many years of hands-on experience do you have in AI/ML coding?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:33.415Z"
+    },
+    "question.5e66a12cf66839128b6ed7af8a6a2d25be54252faec0d0edd22e7c3aad467e9a": {
+      "key": "question.5e66a12cf66839128b6ed7af8a6a2d25be54252faec0d0edd22e7c3aad467e9a",
+      "question": "How many years of experience do you have in Unix/Linux system programming and multithreaded programming?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:35.834Z"
+    },
+    "question.fefd8683dfe1be1de1ca636b1a1d43f9348b675470dc7a3d979b5b75739180f7": {
+      "key": "question.fefd8683dfe1be1de1ca636b1a1d43f9348b675470dc7a3d979b5b75739180f7",
+      "question": "How many years of hands-on experience do you have in Data Science and related analytics disciplines?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:38.253Z"
+    },
+    "question.945028c5b5c4faee3dbd1f3675489eaf2a6ac372c95f56949225e34c2af8222b": {
+      "key": "question.945028c5b5c4faee3dbd1f3675489eaf2a6ac372c95f56949225e34c2af8222b",
+      "question": "Associated Degree",
+      "value": "BSc (H) Computer Science",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:40.676Z"
+    },
+    "question.beff2e1e49d68fc9e66d45820f786dad80855f8a0e297751d18a6e2bbc38ef4c": {
+      "key": "question.beff2e1e49d68fc9e66d45820f786dad80855f8a0e297751d18a6e2bbc38ef4c",
+      "question": "I choose not to disclose",
+      "value": "I am not a military spouse or partner",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:48.941Z"
+    },
+    "question.fe68cff48b822eb2f890a6b7bae51623380ce769e49a46e2a8e74f068745ee77": {
+      "key": "question.fe68cff48b822eb2f890a6b7bae51623380ce769e49a46e2a8e74f068745ee77",
+      "question": "Current Military Fellow",
+      "value": "No - Never associated with NetApp",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:27:54.168Z"
+    },
+    "question.92be0a91241fa146adb3ced59eff7db34d4e7001f4d761beaadea71333da8cbe": {
+      "key": "question.92be0a91241fa146adb3ced59eff7db34d4e7001f4d761beaadea71333da8cbe",
+      "question": "Will you now or in the future require sponsorship for employment (e.g. H-1B visa status)?",
+      "value": "No",
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:34:00.966Z",
+      "updatedAt": "2026-09-04T11:34:00.966Z"
+    },
+    "question.798ddd04d23c6044bf489edccc05459c3059693cbf7d990e58fca475de87d69f": {
+      "key": "question.798ddd04d23c6044bf489edccc05459c3059693cbf7d990e58fca475de87d69f",
+      "question": "Have you previously been employed by or received an offer from Flexera?",
+      "value": "No",
+      "aliases": [
+        "employed or received offer",
+        "offer from flexera"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.409Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.f0a1fd7666d88d346c53726b5290f35a2e251f244708c180e98ad6960a71fe0f": {
+      "key": "question.f0a1fd7666d88d346c53726b5290f35a2e251f244708c180e98ad6960a71fe0f",
+      "question": "Do you have any restrictive covenants e.g.noncompete/confidentiality agreements with current/previous employer,which restrict you performing this job?",
+      "value": "No",
+      "aliases": [
+        "restrictive covenants",
+        "noncompete",
+        "confidentiality agreements"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.53de4f54a1edc84270ced490c0972ddc82baadec4c883b4b6af75ca5d91a5c64": {
+      "key": "question.53de4f54a1edc84270ced490c0972ddc82baadec4c883b4b6af75ca5d91a5c64",
+      "question": "How many years of experience do you have in IOT?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:28:26.328Z"
+    },
+    "question.2c840625a7407f2d29d0c73d92eac6823ec01090aca183fe71b501caadc74d25": {
+      "key": "question.2c840625a7407f2d29d0c73d92eac6823ec01090aca183fe71b501caadc74d25",
+      "question": "Do you have any offer in hand?",
+      "value": "No",
+      "aliases": [
+        "offer in hand",
+        "holding offer",
+        "any offer",
+        "holding any other offer"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.42ca632aab6ed9fa370a442a33661274cff589c9906972bc09d2aeec2f14501e": {
+      "key": "question.42ca632aab6ed9fa370a442a33661274cff589c9906972bc09d2aeec2f14501e",
+      "question": "Are you holding any other offer?",
+      "value": "No",
+      "aliases": [
+        "holding offer",
+        "other offers",
+        "counter offer"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.f26052c80164f9b406dbcbf883c927215d606367ad901ebc4c9fdb9229872ff7": {
+      "key": "question.f26052c80164f9b406dbcbf883c927215d606367ad901ebc4c9fdb9229872ff7",
+      "question": "Do you have any existing offers?",
+      "value": "No",
+      "aliases": [
+        "existing offers",
+        "current offers"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.bf585cc7fc15a7d71f276f20f48a4ab53cf0a39d553860058abaf5a192b33c00": {
+      "key": "question.bf585cc7fc15a7d71f276f20f48a4ab53cf0a39d553860058abaf5a192b33c00",
+      "question": "Have you previously been associated with this company?",
+      "value": "No",
+      "aliases": [
+        "previously associated",
+        "associated with",
+        "worked with us before",
+        "ex employee"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.bb4272ad4638eb5fa77f86a24b7b3d34fc018aabe07b9e1b3e39abf09402e507": {
+      "key": "question.bb4272ad4638eb5fa77f86a24b7b3d34fc018aabe07b9e1b3e39abf09402e507",
+      "question": "Have you ever worked with or been associated with us before?",
+      "value": "No",
+      "aliases": [
+        "previously employed",
+        "past employee",
+        "past intern",
+        "associated with"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.7ddeb7f59b03ab9af7cc102b37fecfedc0ef88a5c7c7d3cfd6ef7286e20515db": {
+      "key": "question.7ddeb7f59b03ab9af7cc102b37fecfedc0ef88a5c7c7d3cfd6ef7286e20515db",
+      "question": "Have you previously been employed with our organization?",
+      "value": "No",
+      "aliases": [],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.a2be524729e96628b3babdd073010ff1cd11d3596faef7fea95461ac1a4bb59d": {
+      "key": "question.a2be524729e96628b3babdd073010ff1cd11d3596faef7fea95461ac1a4bb59d",
+      "question": "Are you a military spouse or partner?",
+      "value": "No",
+      "aliases": [
+        "military spouse",
+        "military partner",
+        "i am not a military spouse or partner"
+      ],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.f27517a29cdd10b6ee977d83f35f9bdc830e047fc034c9c0bd5c116258588163": {
+      "key": "question.f27517a29cdd10b6ee977d83f35f9bdc830e047fc034c9c0bd5c116258588163",
+      "question": "I am a military spouse or partner",
+      "value": "I am not a military spouse or partner",
+      "aliases": [],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.5622fc3ae53e76c0acbceacea680b59de7db355fed93d705398647896e7779b8": {
+      "key": "question.5622fc3ae53e76c0acbceacea680b59de7db355fed93d705398647896e7779b8",
+      "question": "Military spouse status",
+      "value": "No",
+      "aliases": [],
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:29:10.410Z",
+      "updatedAt": "2026-09-04T11:29:10.410Z"
+    },
+    "question.68fa8f9b27b1aeac5a955255317e311c85807f49c2e731a93213b3be373165d6": {
+      "key": "question.68fa8f9b27b1aeac5a955255317e311c85807f49c2e731a93213b3be373165d6",
+      "question": "Will you require sponsorship for employment?",
+      "value": "No",
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:34:00.966Z",
+      "updatedAt": "2026-09-04T11:34:00.966Z"
+    },
+    "question.6e09d672bf0b362434cc401991a06d9c01d53372d4e747a2f185c50f5261c3ba": {
+      "key": "question.6e09d672bf0b362434cc401991a06d9c01d53372d4e747a2f185c50f5261c3ba",
+      "question": "Do you require visa sponsorship?",
+      "value": "No",
+      "source": "user_correction",
+      "state": "confirmed",
+      "confirmedAt": "2026-09-04T11:34:00.966Z",
+      "updatedAt": "2026-09-04T11:34:00.966Z"
+    },
+    "question.55994f1fa26fa6ae92997645d50ef9c9591706a0cded600a52fbc1adcb27834e": {
+      "key": "question.55994f1fa26fa6ae92997645d50ef9c9591706a0cded600a52fbc1adcb27834e",
+      "question": ">12 years",
+      "value": "<9 years",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:35:50.584Z"
+    },
+    "question.208f669897ef040507c48e8e9f32d977db96d471adf49c60dbe439974122425f": {
+      "key": "question.208f669897ef040507c48e8e9f32d977db96d471adf49c60dbe439974122425f",
+      "question": "How many years of experience you are having in Python Scripting?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:35:53.208Z"
+    },
+    "question.a8103b631e0fb72be5997bc6cd6284c8792540f5b464bef68da367a8c58c4728": {
+      "key": "question.a8103b631e0fb72be5997bc6cd6284c8792540f5b464bef68da367a8c58c4728",
+      "question": "How many year of experience you are having in Fabric Lakehouse?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:35:55.633Z"
+    },
+    "question.d498c2dfb8ae12acf6df293368e3d6c6c90ca058d7e379445606ac24dbf367d0": {
+      "key": "question.d498c2dfb8ae12acf6df293368e3d6c6c90ca058d7e379445606ac24dbf367d0",
+      "question": "How many years of experience do you have in Java?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:36:11.167Z"
+    },
+    "question.bf10561cf7eda05bfb62250dffb2b219651a835d647a30a14d903ac0672e17c5": {
+      "key": "question.bf10561cf7eda05bfb62250dffb2b219651a835d647a30a14d903ac0672e17c5",
+      "question": "How many years of experience do you have in java backend?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:36:13.588Z"
+    },
+    "question.38819b1ad6d8dec8e43967aa738fcb7e47bc2465078552b3ad69bf2c98a742ae": {
+      "key": "question.38819b1ad6d8dec8e43967aa738fcb7e47bc2465078552b3ad69bf2c98a742ae",
+      "question": "How many years of experience do you have in Bigquery?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:36:16.009Z"
+    },
+    "question.ce2ea3a802b745ff767c372f7cb44a9357ebf6ab5b373fbc9d860df7562d5f30": {
+      "key": "question.ce2ea3a802b745ff767c372f7cb44a9357ebf6ab5b373fbc9d860df7562d5f30",
+      "question": "How many years of experience do you have in Microservices?",
+      "value": "7",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T11:36:18.428Z"
+    }
+  },
+  "metadata": {
+    "createdAt": "2026-08-26T02:34:54Z",
+    "updatedAt": "2026-09-04T11:38:29.295Z"
+  },
+  "schemaVersion": 1
+}
