@@ -66,10 +66,154 @@
       "source": "learned_automation",
       "state": "confirmed",
       "updatedAt": "2026-09-04T11:59:58.087Z"
+    },
+    "question.01db91d06032cc64162c16f8e35725b0e632beebdde8b2c2459979d04fb1e20c": {
+      "key": "question.01db91d06032cc64162c16f8e35725b0e632beebdde8b2c2459979d04fb1e20c",
+      "question": "Others",
+      "value": "Campus / Fresher Hiring, Lateral / Experienced Hiring, Leadership / CXO Hiring",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:02:20.938Z"
+    },
+    "question.5b5dedee32c5bd671f8d930b734993338d4192be1f63d0dfd64d1963586d7953": {
+      "key": "question.5b5dedee32c5bd671f8d930b734993338d4192be1f63d0dfd64d1963586d7953",
+      "question": "Try again",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:02:12.469Z"
+    },
+    "question.dc328088efc21058c3db7023ac3f0c6ec3570839b9dc2cb27fab0680400fa8b1": {
+      "key": "question.dc328088efc21058c3db7023ac3f0c6ec3570839b9dc2cb27fab0680400fa8b1",
+      "question": "What is your notice period? If Serving LWD details please",
+      "value": "15 days",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:03:12.537Z"
+    },
+    "question.ffb238d09ffec7c7a3e683a6b270ad04a7918d8fbfa35e282a6d6e091b8db533": {
+      "key": "question.ffb238d09ffec7c7a3e683a6b270ad04a7918d8fbfa35e282a6d6e091b8db533",
+      "question": "How many years of experience do you have in IT Recruitment?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:03:14.962Z"
+    },
+    "question.f902fab777d8ef4d192ccb98cf2327ea7b0851de59c513ead399feecf7559199": {
+      "key": "question.f902fab777d8ef4d192ccb98cf2327ea7b0851de59c513ead399feecf7559199",
+      "question": "Are you comfortable to commute 5days WFO? BTM layout location",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:03:17.385Z"
+    },
+    "question.b21fa94970378aad6cea7f1473fecd5b46892641282d79f49aff79e0db65170c": {
+      "key": "question.b21fa94970378aad6cea7f1473fecd5b46892641282d79f49aff79e0db65170c",
+      "question": "Are you available for Virtual interview on 4th and 5th of September?",
+      "value": "yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:03:28.870Z"
+    },
+    "question.82fb684f700fa9f96aafca7d91ef5671f5b2df101c746f0361edacd32400088a": {
+      "key": "question.82fb684f700fa9f96aafca7d91ef5671f5b2df101c746f0361edacd32400088a",
+      "question": "Do you have any counter offer in hand? If Yes, CTC details please",
+      "value": "No",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:03:37.243Z"
+    },
+    "question.47551c84c02137c26944d63a9a1c3c1d128e063c64cc1bcd9748ba2a66b010c0": {
+      "key": "question.47551c84c02137c26944d63a9a1c3c1d128e063c64cc1bcd9748ba2a66b010c0",
+      "question": "Are you available for a Face to Face discussion on 7th Sept 2026",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:04:29.220Z"
+    },
+    "question.e3357b0675d12232bc172e7199769cbe85e0ff6af1536df07735badc04ac0f98": {
+      "key": "question.e3357b0675d12232bc172e7199769cbe85e0ff6af1536df07735badc04ac0f98",
+      "question": "How many years of experience do you have in Recruitment Management?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:04:53.202Z"
+    },
+    "question.34a5a01b031133112e8bc2be6030c7b928888053360c017648ebef9a5ddfe15e": {
+      "key": "question.34a5a01b031133112e8bc2be6030c7b928888053360c017648ebef9a5ddfe15e",
+      "question": "How many years of experience you have in stakeholder management?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:04:55.624Z"
+    },
+    "question.6d9ac40a2e075903dc57e135f5f1a1583e57efc6363ce680d5a135c9b4807019": {
+      "key": "question.6d9ac40a2e075903dc57e135f5f1a1583e57efc6363ce680d5a135c9b4807019",
+      "question": "How many years of experience do you have in Sourcing?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:04:58.048Z"
+    },
+    "question.10a70075635abc370f126c26ddbaaa885c4ffd8876f4017602fa4e9bbbd7e003": {
+      "key": "question.10a70075635abc370f126c26ddbaaa885c4ffd8876f4017602fa4e9bbbd7e003",
+      "question": "Are you currently working ?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:05:25.697Z"
+    },
+    "question.83dcce0e1fcb518853750f650523554a074df56aadd033bdd061b5bacb641dfe": {
+      "key": "question.83dcce0e1fcb518853750f650523554a074df56aadd033bdd061b5bacb641dfe",
+      "question": "Reason for looking WFH ?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:05:28.316Z"
+    },
+    "question.7af580976d463ec209f8b784d25a4f6ad1a1d7f20706bd396463ccf7b0c455e0": {
+      "key": "question.7af580976d463ec209f8b784d25a4f6ad1a1d7f20706bd396463ccf7b0c455e0",
+      "question": "None of the above",
+      "value": "Branch Manager/Agency Manager, Insurance/Banking FLS, CXO level",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:05:57.636Z"
+    },
+    "question.7ce4cebea06054f2d94ea1c3b942009494f5d3b1b20f6db92861ed2dad0b18d0": {
+      "key": "question.7ce4cebea06054f2d94ea1c3b942009494f5d3b1b20f6db92861ed2dad0b18d0",
+      "question": "THIS IS A WORK FROM HOME OPPORTUNITY, DO YOU HAVE LAPTOP WITH INTERNET?",
+      "value": "YES",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:06:00.282Z"
+    },
+    "question.b20186ff5225f2672c095700cb294b9c0e4591022cd96a0cb102d3084bb94b5e": {
+      "key": "question.b20186ff5225f2672c095700cb294b9c0e4591022cd96a0cb102d3084bb94b5e",
+      "question": "Are you willing to negotiate on your CTC expectation since this is a work from home opportunity?",
+      "value": "Yes",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:06:03.341Z"
+    },
+    "question.e727e217a6fcc7f20bf41b8550c9e088ae36036c9ab4c8888dd81fa163eff6a1": {
+      "key": "question.e727e217a6fcc7f20bf41b8550c9e088ae36036c9ab4c8888dd81fa163eff6a1",
+      "question": "How many years of Recruitment experience do you have?",
+      "value": "4",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:06:05.960Z"
+    },
+    "question.f9358d300d483a7de5b690447de6508a52194226e5ba52ce06b4ab029b8cdcb8": {
+      "key": "question.f9358d300d483a7de5b690447de6508a52194226e5ba52ce06b4ab029b8cdcb8",
+      "question": "Non IT recruitment",
+      "value": "IT recruitment",
+      "source": "learned_automation",
+      "state": "confirmed",
+      "updatedAt": "2026-09-04T12:06:11.613Z"
     }
   },
   "metadata": {
     "profileId": "sraboni-das-client-manager",
-    "updatedAt": "2026-09-04T11:59:58.087Z"
+    "updatedAt": "2026-09-04T12:06:11.613Z"
   }
 }

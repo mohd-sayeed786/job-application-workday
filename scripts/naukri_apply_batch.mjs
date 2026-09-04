@@ -1390,6 +1390,7 @@ async function main() {
     const clicked = await findAndClickQuickApply(jobPage);
     if (!clicked) {
       console.log("Quick apply button was not clickable on this page. Moving to next candidate.");
+      if (!jobPage.isClosed()) await jobPage.close();
       continue;
     }
 

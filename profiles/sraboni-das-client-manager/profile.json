@@ -95,11 +95,11 @@
     ]
   },
   "searchFeeds": [
+    "https://www.naukri.com/talent-acquisition-jobs-in-bengaluru?sort=r&jobAge=7&k=talent%20acquisition&l=bengaluru",
     "https://www.naukri.com/client-manager-jobs-in-bengaluru?sort=r&jobAge=7&k=client%20manager&l=bengaluru",
     "https://www.naukri.com/hr-business-partner-jobs-in-bengaluru?sort=r&jobAge=7&k=hr%20business%20partner&l=bengaluru",
-    "https://www.naukri.com/hrbp-jobs-in-bengaluru?sort=r&jobAge=7&k=hrbp&l=bengaluru",
     "https://www.naukri.com/hr-generalist-jobs-in-bengaluru?sort=r&jobAge=7&k=hr%20generalist&l=bengaluru",
-    "https://www.naukri.com/key-account-manager-jobs-in-bengaluru?sort=r&jobAge=7&k=key%20account%20manager&l=bengaluru",
-    "https://www.naukri.com/talent-acquisition-specialist-jobs-in-bengaluru?sort=r&jobAge=7&k=talent%20acquisition%20specialist&l=bengaluru"
+    "https://www.naukri.com/recruitment-specialist-jobs-in-bengaluru?sort=r&jobAge=7&k=recruitment%20specialist&l=bengaluru",
+    "https://www.naukri.com/key-account-manager-jobs-in-bengaluru?sort=r&jobAge=7&k=key%20account%20manager&l=bengaluru"
   ]
 }
